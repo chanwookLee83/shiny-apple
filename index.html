@@ -2227,12 +2227,20 @@ function processPartsFile(file) {
       const ws = wb.Sheets[wb.SheetNames[0]];
       const raw = XLSX.utils.sheet_to_json(ws, { header:1, defval:'' });
       if (!raw || raw.length < 2) { alert('데이터가 없습니다. 헤더 + 데이터 행이 있는 파일을 사용하세요.'); return; }
-      const headers = raw[0].map((h,i) => h ? String(h).trim() : `열${i+1}`);
-      const dataRows = raw.slice(1).filter(r => r.some(c => c !== ''));
+
+      // 헤더 행 자동 탐지: 첫 15행 중 품번/품명 키워드가 있는 행 찾기
+      const HDR_KEYWORDS = ['품번','품명','partno','partname','part_no','part_name','부품번호','부품명','자재번호','자재명','코드','품목'];
+      let hdrRowIdx = 0;
+      for (let i = 0; i < Math.min(raw.length, 15); i++) {
+        const rowLower = raw[i].map(c => String(c||'').toLowerCase().replace(/[\s_\-\(\)]/g,''));
+        if (HDR_KEYWORDS.some(k => rowLower.some(c => c.includes(k)))) { hdrRowIdx = i; break; }
+      }
+      const headers = raw[hdrRowIdx].map((h,i) => h ? String(h).trim() : `열${i+1}`);
+      const dataRows = raw.slice(hdrRowIdx + 1).filter(r => r.some(c => c !== ''));
       const cm = detectPartsColumns(headers);
       // 열 매핑이 안 됐을 경우 경고
       if (!cm.partNo && !cm.partName) {
-        alert(`품번 또는 품명 열을 찾지 못했습니다.\n검출된 열: ${headers.join(', ')}\n\n엑셀 첫 행에 "품번", "품명" 같은 헤더를 추가해주세요.`);
+        alert(`품번 또는 품명 열을 찾지 못했습니다.\n검출된 열(${hdrRowIdx+1}행 기준): ${headers.join(', ')}\n\n헤더 행에 "품번", "품명" 같은 열 이름이 있는지 확인해주세요.`);
         return;
       }
       // 파싱
