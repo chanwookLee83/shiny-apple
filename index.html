@@ -8,9 +8,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="/manifest.json">
 <title>품질 주간 회의</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -242,6 +243,14 @@ body.light select.finp option{background:#fff;color:#0f172a}
 
 /* PRINT */
 @media print{header,.nav-tabs{display:none}main{margin-top:0!important}.section{display:block!important}.card{break-inside:avoid}}
+
+/* FC DROP ZONE */
+.fc-drop-zone{border:2px dashed var(--border);border-radius:14px;padding:36px 20px;cursor:pointer;transition:all .25s;max-width:440px;margin:0 auto;text-align:center}
+.fc-drop-zone:hover,.fc-drop-zone.drag-over{border-color:var(--accent-blue);background:rgba(37,99,235,.07)}
+.fc-drop-zone p{color:var(--text-muted);margin-top:8px;font-size:.88rem}
+.fc-view-btn{height:30px;padding:0 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-muted);font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+.fc-view-btn:hover{background:rgba(128,128,128,.1);color:var(--text-primary)}
+.fc-view-btn.active-view{background:rgba(37,99,235,.15);border-color:rgba(37,99,235,.4);color:var(--accent-cyan)}
 </style>
 </head>
 <body>
@@ -273,6 +282,7 @@ body.light select.finp option{background:#fff;color:#0f172a}
   <button class="tab-btn" onclick="showTab('improve')" data-tab="improve"><span class="tab-dot"></span>개선 활동</button>
   <button class="tab-btn" onclick="showTab('issues')" data-tab="issues"><span class="tab-dot"></span>주요 이슈</button>
   <button class="tab-btn" onclick="showTab('parts')" data-tab="parts"><span class="tab-dot"></span>품번/품명</button>
+  <button class="tab-btn" onclick="showTab('failcost')" data-tab="failcost"><span class="tab-dot"></span>실패비용 분석</button>
   <div class="font-ctrl">
     <button class="font-btn" onclick="setFontSize(-1)" title="글자 작게">A−</button>
     <input class="font-size-input" id="fontSizeInput" type="number" min="70" max="150" step="5" value="100" onchange="setFontSizeInput(this.value)" title="글자 크기(%)">
@@ -289,6 +299,7 @@ body.light select.finp option{background:#fff;color:#0f172a}
   <div id="tab-improve" class="section"></div>
   <div id="tab-issues" class="section"></div>
   <div id="tab-parts" class="section"></div>
+  <div id="tab-failcost" class="section"></div>
 </main>
 <datalist id="partsList"></datalist>
 
@@ -1707,6 +1718,409 @@ function showTab(id) {
 }
 
 // ═══════════════════════════════════════════════
+// FAILURE COST ANALYSIS (EXCEL IMPORT)
+// ═══════════════════════════════════════════════
+let fcData = null; // { headers:[], rows:[], colMap:{} }
+let fcView = 'monthly'; // 'yearly' | 'monthly' | 'weekly'
+
+function renderFailureAnalysis() {
+  const el = document.getElementById('tab-failcost');
+  if (!el) return;
+
+  if (!fcData || !fcData.rows || !fcData.rows.length) {
+    el.innerHTML = `
+      <div class="page-hdr"><h2>실패 비용 분석</h2></div>
+      <div class="card" style="text-align:center;padding:48px 24px">
+        <div style="font-size:3.5rem;margin-bottom:16px">📊</div>
+        <h3 style="margin-bottom:8px;font-size:1.15rem">엑셀 파일을 업로드하면 자동으로 분석합니다</h3>
+        <p style="color:var(--text-muted);margin-bottom:28px;font-size:.85rem;line-height:1.7">
+          업체별 실패 비용 데이터가 담긴 <strong>.xlsx / .xls / .csv</strong> 파일을 선택하면<br>
+          연간 · 월별 · 주별 업체별 실패 비용을 자동으로 분석하여 표와 차트로 보여줍니다.
+        </p>
+        <div class="fc-drop-zone" onclick="document.getElementById('fcFileInput').click()"
+             ondragover="event.preventDefault();this.classList.add('drag-over')"
+             ondragleave="this.classList.remove('drag-over')"
+             ondrop="event.preventDefault();this.classList.remove('drag-over');handleExcelDrop(event)">
+          <div style="font-size:2.8rem">📂</div>
+          <p style="font-weight:700;font-size:.95rem;margin-top:10px">클릭하거나 파일을 드롭하세요</p>
+          <p style="font-size:.75rem;color:var(--text-dim);margin-top:6px">.xlsx · .xls · .csv 지원</p>
+        </div>
+        <input type="file" id="fcFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelUpload(event)">
+        <div style="margin-top:28px;padding:16px 20px;background:rgba(37,99,235,.06);border-radius:12px;text-align:left;font-size:.8rem;color:var(--text-muted);line-height:1.8">
+          <strong style="color:var(--accent-cyan);font-size:.85rem">📋 권장 엑셀 파일 형식</strong><br>
+          첫 행을 헤더(열 이름)로, 이후 행을 데이터로 구성하세요.<br>
+          <span style="color:var(--accent-gold)">날짜</span> · <span style="color:var(--accent-gold)">업체명</span> · <span style="color:var(--accent-gold)">재작업비용</span> · <span style="color:var(--accent-gold)">폐기비용</span> · <span style="color:var(--accent-gold)">기타비용</span> (또는 <span style="color:var(--accent-gold)">총비용</span>) 열을 포함하면 가장 정확합니다.<br>
+          <span style="color:var(--text-dim)">예) A1:날짜, B1:업체명, C1:재작업비용, D1:폐기비용, E1:기타비용</span>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const analysis = buildFcAnalysis(fcData, fcView);
+
+  el.innerHTML = `
+    <div class="page-hdr">
+      <h2>실패 비용 분석</h2>
+      <div class="hdr-actions">
+        <button class="btn-sec" onclick="document.getElementById('fcFileInput2').click()">📂 다른 파일 불러오기</button>
+        <input type="file" id="fcFileInput2" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelUpload(event)">
+        <button class="btn-print" onclick="window.print()">🖨 인쇄</button>
+      </div>
+    </div>
+    ${renderFcKpis(analysis)}
+    <div class="card">
+      <div class="card-hdr">
+        <span class="card-title">🗂️ 열 매핑 설정</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:.75rem;color:var(--text-dim)">${esc(fcData.fileName||'')}</span>
+          <button class="btn-edit btn-edit-text" onclick="openFcColMapModal()">✏ 열 변경</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:.78rem">
+        ${Object.entries(fcData.colMap).map(([k,v])=>`
+          <span style="background:rgba(37,99,235,.09);border:1px solid rgba(37,99,235,.22);border-radius:8px;padding:4px 12px">
+            <strong style="color:var(--accent-cyan)">${{date:'날짜',vendor:'업체명',rework:'재작업비용',scrap:'폐기비용',extra:'기타비용',total:'총비용'}[k]||k}</strong>
+            → <span style="color:${v?'var(--text-primary)':'var(--text-dim)'}">${v||'미설정'}</span>
+          </span>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr">
+        <span class="card-title">📈 기간별 업체별 실패 비용</span>
+        <div style="display:flex;gap:6px">
+          <button class="fc-view-btn${fcView==='yearly'?' active-view':''}" onclick="setFcView('yearly')">연간</button>
+          <button class="fc-view-btn${fcView==='monthly'?' active-view':''}" onclick="setFcView('monthly')">월별</button>
+          <button class="fc-view-btn${fcView==='weekly'?' active-view':''}" onclick="setFcView('weekly')">주별</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        ${renderFcTable(analysis)}
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-hdr">
+          <span class="card-title">🏭 업체별 총 실패 비용</span>
+          <span class="cb">${{yearly:'연간',monthly:'전체 월',weekly:'전체 주'}[fcView]||''} 합계</span>
+        </div>
+        <div class="chart-wrap" style="height:${Math.max(200, analysis.vendors.length*46)}px">
+          <canvas id="chartFcVendor"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr">
+          <span class="card-title">📅 기간별 실패 비용 추이</span>
+          <span class="cb">상위 5개 업체</span>
+        </div>
+        <div class="chart-wrap"><canvas id="chartFcTrend"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr">
+        <span class="card-title">📊 업체별 비용 구성 (누적 막대)</span>
+        <span class="cb">${{yearly:'연간',monthly:'월별',weekly:'주별'}[fcView]}</span>
+      </div>
+      <div class="chart-wrap" style="height:${Math.max(220, analysis.vendors.length*48)}px">
+        <canvas id="chartFcStack"></canvas>
+      </div>
+    </div>`;
+
+  setTimeout(() => initFcCharts(analysis), 60);
+}
+
+function setFcView(v) { fcView = v; renderFailureAnalysis(); }
+
+// ── 분석 로직 ──
+function buildFcAnalysis(data, groupBy) {
+  const { rows, colMap } = data;
+  const vendorSet = new Set();
+  const periodSet = new Set();
+  const matrix = {}; // period -> vendor -> {rework, scrap, extra, total}
+
+  rows.forEach(row => {
+    const vendor = String(row[colMap.vendor] || '').trim();
+    if (!vendor) return;
+    vendorSet.add(vendor);
+
+    const dateVal = row[colMap.date];
+    let period = '기간미상';
+    const d = parseFcDate(dateVal);
+    if (d) {
+      if (groupBy === 'yearly')        period = `${d.getFullYear()}년`;
+      else if (groupBy === 'monthly')  period = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+      else                             period = `${d.getFullYear()}-W${String(getWeekNum(d)).padStart(2,'0')}`;
+    }
+    periodSet.add(period);
+
+    if (!matrix[period]) matrix[period] = {};
+    if (!matrix[period][vendor]) matrix[period][vendor] = {rework:0,scrap:0,extra:0,total:0};
+
+    const rework = parseMoney(row[colMap.rework]);
+    const scrap  = parseMoney(row[colMap.scrap]);
+    const extra  = parseMoney(row[colMap.extra]);
+    let   total  = parseMoney(row[colMap.total]);
+    if (total === 0) total = rework + scrap + extra;
+
+    matrix[period][vendor].rework += rework;
+    matrix[period][vendor].scrap  += scrap;
+    matrix[period][vendor].extra  += extra;
+    matrix[period][vendor].total  += total;
+  });
+
+  const vendors = [...vendorSet].sort();
+  const periods = [...periodSet].sort();
+
+  const vendorTotals = {};
+  vendors.forEach(v => {
+    vendorTotals[v] = periods.reduce((s,p) => s + (matrix[p]?.[v]?.total||0), 0);
+  });
+  const grandTotal = Object.values(vendorTotals).reduce((s,v)=>s+v, 0);
+
+  return { vendors, periods, matrix, vendorTotals, grandTotal, rowCount: rows.length };
+}
+
+function parseFcDate(val) {
+  if (!val && val !== 0) return null;
+  if (typeof val === 'number') {
+    // Excel serial → JS date
+    const d = new Date(Math.round((val - 25569) * 86400 * 1000));
+    if (!isNaN(d)) return d;
+  }
+  const s = String(val).trim();
+  let m = s.match(/(\d{4})[.\-\/](\d{1,2})[.\-\/](\d{1,2})/);
+  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
+  m = s.match(/(\d{4})년\s*(\d{1,2})월(?:\s*(\d{1,2})일)?/);
+  if (m) return new Date(+m[1], +m[2]-1, m[3]?+m[3]:1);
+  m = s.match(/(\d{4})(\d{2})(\d{2})/);
+  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
+  return null;
+}
+
+function parseMoney(val) {
+  if (!val && val !== 0) return 0;
+  return parseFloat(String(val).replace(/[₩,\s원]/g,'')) || 0;
+}
+
+// ── KPI 카드 ──
+function renderFcKpis(analysis) {
+  const sorted = [...analysis.vendors].sort((a,b) => (analysis.vendorTotals[b]||0) - (analysis.vendorTotals[a]||0));
+  const top = sorted[0] || '—';
+  const topCost = analysis.vendorTotals[top] || 0;
+  const labelPeriod = {yearly:'연도',monthly:'월',weekly:'주'}[fcView]||'기간';
+  return `<div class="g4 sp">
+    <div class="kpi" style="--kc:#ef4444">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-lbl">총 실패 비용</div>
+      <div class="kpi-val" style="font-size:1.4rem">${fmtWon(analysis.grandTotal)}</div>
+      <div class="kpi-sub">분석 기간 전체 합계</div>
+    </div>
+    <div class="kpi" style="--kc:#f59e0b">
+      <div class="kpi-icon">🏭</div>
+      <div class="kpi-lbl">분석 업체 수</div>
+      <div class="kpi-val">${analysis.vendors.length}개</div>
+      <div class="kpi-sub">${analysis.rowCount.toLocaleString()}행 데이터 분석</div>
+    </div>
+    <div class="kpi" style="--kc:#a855f7">
+      <div class="kpi-icon">⚠️</div>
+      <div class="kpi-lbl">최고 비용 업체</div>
+      <div class="kpi-val" style="font-size:${top.length>8?'.85rem':'1rem'}">${esc(top)}</div>
+      <div class="kpi-sub">${fmtWon(topCost)}</div>
+    </div>
+    <div class="kpi" style="--kc:#2563eb">
+      <div class="kpi-icon">📅</div>
+      <div class="kpi-lbl">분석 ${labelPeriod} 수</div>
+      <div class="kpi-val">${analysis.periods.length}</div>
+      <div class="kpi-sub">${analysis.periods[0]||'—'} ~ ${analysis.periods[analysis.periods.length-1]||'—'}</div>
+    </div>
+  </div>`;
+}
+
+// ── 피벗 테이블 ──
+function renderFcTable(analysis) {
+  const { vendors, periods, matrix, vendorTotals, grandTotal } = analysis;
+  if (!vendors.length || !periods.length) {
+    return `<div style="text-align:center;padding:32px;color:var(--text-dim)">표시할 데이터가 없습니다. 열 매핑이 올바른지 확인하세요.</div>`;
+  }
+  const MAX_P = 26;
+  const dp = periods.length > MAX_P ? periods.slice(-MAX_P) : periods;
+  const omitted = periods.length > MAX_P ? `<div style="font-size:.74rem;color:var(--text-dim);padding:6px 0">※ 최근 ${MAX_P}개 기간만 표시 (총 ${periods.length}개 중)</div>` : '';
+
+  const thead = dp.map(p=>`<th style="text-align:right;min-width:96px">${esc(p)}</th>`).join('');
+  const tbody = vendors.map(v => {
+    const cells = dp.map(p => {
+      const val = matrix[p]?.[v]?.total || 0;
+      return `<td style="text-align:right;${val>0?'color:#fbbf24':'color:var(--text-dim)'}">${val>0?fmtWon(val):'—'}</td>`;
+    }).join('');
+    const tot = vendorTotals[v]||0;
+    return `<tr>
+      <td style="min-width:130px"><strong>${esc(v)}</strong></td>
+      ${cells}
+      <td style="text-align:right"><strong style="color:#ef4444">${fmtWon(tot)}</strong></td>
+    </tr>`;
+  }).join('');
+  const tfoot = dp.map(p => {
+    const s = vendors.reduce((acc,v)=>acc+(matrix[p]?.[v]?.total||0), 0);
+    return `<td style="text-align:right;font-weight:700;color:#60a5fa">${s>0?fmtWon(s):'—'}</td>`;
+  }).join('');
+
+  return `${omitted}
+  <table class="tbl tbl-nowrap">
+    <thead><tr><th>업체명</th>${thead}<th style="text-align:right">합계</th></tr></thead>
+    <tbody>${tbody}</tbody>
+    <tfoot><tr style="border-top:2px solid var(--border)">
+      <td style="font-weight:700">기간 합계</td>${tfoot}
+      <td style="text-align:right"><strong style="color:#ef4444">${fmtWon(grandTotal)}</strong></td>
+    </tr></tfoot>
+  </table>`;
+}
+
+// ── 차트 ──
+function initFcCharts(analysis) {
+  const isLight = document.body.classList.contains('light');
+  const gc = isLight ? '#e2e8f0' : '#1e2d4a';
+  const tc = isLight ? '#475569' : '#94a3b8';
+  const destroy = id => { const c = Chart.getChart(id); if (c) c.destroy(); };
+  const PAL = ['#ef4444','#f59e0b','#22c55e','#2563eb','#a855f7','#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6'];
+
+  // 업체별 가로 막대
+  if (document.getElementById('chartFcVendor')) {
+    destroy('chartFcVendor');
+    const sv = [...analysis.vendors].sort((a,b)=>(analysis.vendorTotals[b]||0)-(analysis.vendorTotals[a]||0));
+    new Chart('chartFcVendor', {
+      type:'bar',
+      data:{ labels:sv, datasets:[{label:'실패 비용',data:sv.map(v=>analysis.vendorTotals[v]||0),backgroundColor:sv.map((_,i)=>PAL[i%PAL.length]+'cc'),borderRadius:5}]},
+      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmtWon(ctx.raw)}`}}},
+        scales:{x:{grid:{color:gc},ticks:{color:tc,callback:v=>fmtWon(v)}},y:{grid:{display:false},ticks:{color:tc}}}}
+    });
+  }
+
+  // 기간별 추이 (상위 5개 업체)
+  if (document.getElementById('chartFcTrend')) {
+    destroy('chartFcTrend');
+    const MAX_P = 20;
+    const dp = analysis.periods.length > MAX_P ? analysis.periods.slice(-MAX_P) : analysis.periods;
+    const top5 = [...analysis.vendors].sort((a,b)=>(analysis.vendorTotals[b]||0)-(analysis.vendorTotals[a]||0)).slice(0,5);
+    new Chart('chartFcTrend', {
+      type:'line',
+      data:{labels:dp, datasets:top5.map((v,i)=>({
+        label:v, data:dp.map(p=>analysis.matrix[p]?.[v]?.total||0),
+        borderColor:PAL[i%PAL.length], backgroundColor:PAL[i%PAL.length]+'22',
+        borderWidth:2.2, pointRadius:3, tension:.3, fill:false
+      }))},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'top',labels:{boxWidth:10,padding:8,color:tc}},
+                 tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmtWon(ctx.raw)}`}}},
+        scales:{y:{grid:{color:gc},beginAtZero:true,ticks:{color:tc,callback:v=>fmtWon(v)}},
+                x:{grid:{display:false},ticks:{color:tc}}}}
+    });
+  }
+
+  // 업체별 누적 막대
+  if (document.getElementById('chartFcStack')) {
+    destroy('chartFcStack');
+    const MAX_P = 16;
+    const dp = analysis.periods.length > MAX_P ? analysis.periods.slice(-MAX_P) : analysis.periods;
+    const sv = [...analysis.vendors].sort((a,b)=>(analysis.vendorTotals[b]||0)-(analysis.vendorTotals[a]||0));
+    new Chart('chartFcStack', {
+      type:'bar',
+      data:{labels:sv, datasets:dp.map((p,i)=>({
+        label:p, data:sv.map(v=>analysis.matrix[p]?.[v]?.total||0),
+        backgroundColor:PAL[i%PAL.length]+'bb', borderRadius:3
+      }))},
+      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'top',labels:{boxWidth:10,padding:7,color:tc}},
+                 tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmtWon(ctx.raw)}`}}},
+        scales:{x:{stacked:true,grid:{color:gc},ticks:{color:tc,callback:v=>fmtWon(v)}},
+                y:{stacked:true,grid:{display:false},ticks:{color:tc}}}}
+    });
+  }
+}
+
+// ── 파일 처리 ──
+function handleExcelUpload(event) {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  processFcFile(file);
+}
+function handleExcelDrop(event) {
+  const file = event.dataTransfer.files[0];
+  if (!file) return;
+  processFcFile(file);
+}
+function processFcFile(file) {
+  if (typeof XLSX === 'undefined') {
+    alert('라이브러리 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type:'array', cellDates:false });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, { header:1, defval:'' });
+      if (!raw || raw.length < 2) { alert('데이터가 없거나 형식이 맞지 않습니다.\n헤더 행 + 데이터 행이 있는 파일을 사용하세요.'); return; }
+      const headers = raw[0].map((h,i) => h ? String(h).trim() : `열${i+1}`);
+      const rows = raw.slice(1).filter(r=>r.some(c=>c!=='')).map(r=>{
+        const obj={};
+        headers.forEach((h,i)=>{ obj[h]=r[i]??''; });
+        return obj;
+      });
+      const colMap = detectFcColumns(headers);
+      fcData = { headers, rows, colMap, fileName: file.name };
+      fcView = 'monthly';
+      renderFailureAnalysis();
+    } catch(err) {
+      alert('파일 처리 중 오류가 발생했습니다:\n' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ── 열 자동 감지 ──
+function detectFcColumns(headers) {
+  const lw = headers.map(h => h.toLowerCase().replace(/[\s_-]/g,''));
+  const find = (...pats) => {
+    for (const p of pats) {
+      const idx = lw.findIndex(h => h.includes(p));
+      if (idx >= 0) return headers[idx];
+    }
+    return '';
+  };
+  return {
+    date:   find('날짜','일자','date','발생일','접수일','연월일','일시'),
+    vendor: find('업체명','업체','협력사','공급사','vendor','supplier','회사명','거래처','제조사'),
+    rework: find('재작업비용','재작업','rework','재작업금액','수리비','재가공'),
+    scrap:  find('폐기비용','폐기','scrap','폐기금액','불량폐기'),
+    extra:  find('기타비용','기타','extra','기타금액','추가비용'),
+    total:  find('총비용','합계','실패비용','총실패비용','total','sum','총액','금액','비용합계','코스트'),
+  };
+}
+
+// ── 열 매핑 변경 모달 ──
+function openFcColMapModal() {
+  if (!fcData) return;
+  const noneOpt = '(없음)';
+  const opts = [noneOpt, ...fcData.headers];
+  const schema = [
+    {k:'date',  l:'날짜 열',      t:'select', opts},
+    {k:'vendor',l:'업체명 열',    t:'select', opts},
+    {k:'rework',l:'재작업비용 열',t:'select', opts},
+    {k:'scrap', l:'폐기비용 열',  t:'select', opts},
+    {k:'extra', l:'기타비용 열',  t:'select', opts},
+    {k:'total', l:'총비용 열 (재작업+폐기+기타 대신 사용)',t:'select', opts},
+  ];
+  const cur = {};
+  Object.entries(fcData.colMap).forEach(([k,v])=>{ cur[k]=v||noneOpt; });
+  openModal('엑셀 열 매핑 설정', schema, cur, result => {
+    Object.entries(result).forEach(([k,v])=>{ fcData.colMap[k] = v===noneOpt ? '' : v; });
+    renderFailureAnalysis();
+  });
+}
+
+// ═══════════════════════════════════════════════
 // RENDER — PARTS
 // ═══════════════════════════════════════════════
 function renderParts() {
@@ -1784,6 +2198,7 @@ function renderAll() {
   renderImprovements();
   renderIssues();
   renderParts();
+  renderFailureAnalysis();
   updatePartsDatalist();
 }
 
@@ -1796,7 +2211,7 @@ function refresh() {
 // INIT
 // ═══════════════════════════════════════════════
 (function init() {
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
 
   const now = new Date();
   const wk = getWeekNum(now);
