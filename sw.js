@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quality-meeting-v3';
+const CACHE_NAME = 'quality-meeting-v4';
 
 // HTML은 캐시하지 않음 — 항상 최신 파일을 서빙
 const STATIC_ASSETS = ['/manifest.json'];
