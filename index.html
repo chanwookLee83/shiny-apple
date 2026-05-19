@@ -1338,9 +1338,13 @@ function renderFourM() {
     <div class="card">
       <div class="card-hdr">
         <span class="card-title">📊 분류별 4M 현황 (연간 누적)</span>
-        <button class="btn-edit btn-edit-text" onclick="editFourMMonthly()">✏ 데이터 편집</button>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:.7rem;color:var(--accent-green);font-weight:700">⚡ 자동 집계</span>
+          <span class="cb" id="fourMAutoRange"></span>
+        </div>
       </div>
-      <div class="chart-wrap"><canvas id="chartFourM"></canvas></div>
+      ${renderFourMAutoTable()}
+      <div class="chart-wrap" style="margin-top:14px"><canvas id="chartFourM"></canvas></div>
     </div>`;
 }
 function editFourM(id) {
@@ -1357,26 +1361,72 @@ function addFourM() {
     saveData(); refresh();
   });
 }
-function editFourMMonthly() {
-  const m = DB.fourMMonthly;
-  const schema = [];
-  m.labels.forEach((l,i) => {
-    schema.push({k:`lbl${i}`,l:`${i+1}번째 월 이름`,t:'text'});
-    schema.push({k:`man${i}`,l:`${l} Man`,t:'number'});
-    schema.push({k:`machine${i}`,l:`${l} Machine`,t:'number'});
-    schema.push({k:`material${i}`,l:`${l} Material`,t:'number'});
-    schema.push({k:`method${i}`,l:`${l} Method`,t:'number'});
+// 4M 등록 데이터 → 월별 자동 집계
+function calcFourMMonthlyAuto() {
+  const fm = DB.fourm || [];
+  const monthMap = {}; // 'YYYY-MM' -> {Man,Machine,Material,Method}
+
+  fm.forEach(f => {
+    if (!f.date) return;
+    const d = String(f.date).trim();
+    const m = d.match(/(\d{4})[.\-\/](\d{1,2})/);
+    if (!m) return;
+    const key = `${m[1]}-${String(m[2]).padStart(2,'0')}`;
+    if (!monthMap[key]) monthMap[key] = {Man:0,Machine:0,Material:0,Method:0};
+    const t = f.type;
+    if (monthMap[key][t] !== undefined) monthMap[key][t]++;
   });
-  const flat = {};
-  m.labels.forEach((l,i)=>{ flat[`lbl${i}`]=l; flat[`man${i}`]=m.man[i]; flat[`machine${i}`]=m.machine[i]; flat[`material${i}`]=m.material[i]; flat[`method${i}`]=m.method[i]; });
-  openModal('4M 월별 데이터 편집', schema, flat, result => {
-    m.labels = m.labels.map((_,i)=>result[`lbl${i}`]||`${i+1}월`);
-    m.man = m.labels.map((_,i)=>parseFloat(result[`man${i}`])||0);
-    m.machine = m.labels.map((_,i)=>parseFloat(result[`machine${i}`])||0);
-    m.material = m.labels.map((_,i)=>parseFloat(result[`material${i}`])||0);
-    m.method = m.labels.map((_,i)=>parseFloat(result[`method${i}`])||0);
-    saveData(); refresh();
-  });
+
+  // 데이터가 없으면 현재 연도 1~12월 빈 데이터 반환
+  if (!Object.keys(monthMap).length) {
+    const yr = new Date().getFullYear();
+    const labels = Array.from({length:12},(_,i)=>`${yr}-${String(i+1).padStart(2,'0')}`);
+    return { labels, man:labels.map(()=>0), machine:labels.map(()=>0), material:labels.map(()=>0), method:labels.map(()=>0) };
+  }
+
+  const labels = Object.keys(monthMap).sort();
+  return {
+    labels,
+    man:      labels.map(k => monthMap[k].Man      || 0),
+    machine:  labels.map(k => monthMap[k].Machine  || 0),
+    material: labels.map(k => monthMap[k].Material || 0),
+    method:   labels.map(k => monthMap[k].Method   || 0),
+  };
+}
+
+function renderFourMAutoTable() {
+  const auto = calcFourMMonthlyAuto();
+  if (auto.labels.every((_, i) => auto.man[i]+auto.machine[i]+auto.material[i]+auto.method[i] === 0)) {
+    return `<div style="text-align:center;padding:18px;color:var(--text-dim);font-size:.82rem">4M 변경점을 등록하면 자동으로 집계됩니다.</div>`;
+  }
+  const types = [
+    {key:'man',      label:'Man',      color:'#a855f7'},
+    {key:'machine',  label:'Machine',  color:'#2563eb'},
+    {key:'material', label:'Material', color:'#f59e0b'},
+    {key:'method',   label:'Method',   color:'#22c55e'},
+  ];
+  const totals = auto.labels.map((_,i) => auto.man[i]+auto.machine[i]+auto.material[i]+auto.method[i]);
+  const grandTotal = totals.reduce((s,v)=>s+v,0);
+  const thead = auto.labels.map(l=>`<th style="text-align:center;min-width:54px">${esc(l.replace(/^\d{4}-/,''))}</th>`).join('');
+  const tbody = types.map(t => {
+    const cells = auto.labels.map((_,i)=>{
+      const v = auto[t.key][i];
+      return `<td style="text-align:center;color:${v>0?t.color:'var(--text-dim)'}">${v>0?v:'—'}</td>`;
+    }).join('');
+    const rowTotal = auto.labels.reduce((s,_,i)=>s+auto[t.key][i],0);
+    return `<tr><td><span style="font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:10px;background:${t.color}22;color:${t.color}">${t.label}</span></td>${cells}<td style="text-align:center;font-weight:700;color:${t.color}">${rowTotal||'—'}</td></tr>`;
+  }).join('');
+  const tfoot = auto.labels.map((_,i)=>{
+    return `<td style="text-align:center;font-weight:700;color:#60a5fa">${totals[i]||'—'}</td>`;
+  }).join('');
+  return `
+  <div style="overflow-x:auto">
+  <table class="tbl tbl-nowrap" style="font-size:.78rem">
+    <thead><tr><th>구분</th>${thead}<th style="text-align:center">합계</th></tr></thead>
+    <tbody>${tbody}</tbody>
+    <tfoot><tr style="border-top:1px solid var(--border)"><td style="font-weight:700">월 합계</td>${tfoot}<td style="text-align:center;font-weight:800;color:#ef4444">${grandTotal}</td></tr></tfoot>
+  </table>
+  </div>`;
 }
 
 // ═══════════════════════════════════════════════
@@ -1593,22 +1643,28 @@ function initCharts() {
     });
   }
 
-  // 4M monthly
+  // 4M monthly (자동 집계)
   if (document.getElementById('chartFourM')) {
     destroy('chartFourM');
-    const m = DB.fourMMonthly;
+    const m = calcFourMMonthlyAuto();
+    const rangeEl = document.getElementById('fourMAutoRange');
+    if (rangeEl && m.labels.length) rangeEl.textContent = `${m.labels[0]} ~ ${m.labels[m.labels.length-1]}`;
     new Chart('chartFourM', {
       type:'bar',
       data:{
-        labels:m.labels,
+        labels: m.labels.map(l => l.replace(/^\d{4}-/,'')),
         datasets:[
-          {label:'Man',data:m.man,backgroundColor:'rgba(168,85,247,.75)',borderRadius:4},
-          {label:'Machine',data:m.machine,backgroundColor:'rgba(37,99,235,.75)',borderRadius:4},
-          {label:'Material',data:m.material,backgroundColor:'rgba(245,158,11,.75)',borderRadius:4},
-          {label:'Method',data:m.method,backgroundColor:'rgba(34,197,94,.75)',borderRadius:4},
+          {label:'Man',     data:m.man,      backgroundColor:'rgba(168,85,247,.8)', borderRadius:4},
+          {label:'Machine', data:m.machine,  backgroundColor:'rgba(37,99,235,.8)',  borderRadius:4},
+          {label:'Material',data:m.material, backgroundColor:'rgba(245,158,11,.8)', borderRadius:4},
+          {label:'Method',  data:m.method,   backgroundColor:'rgba(34,197,94,.8)',  borderRadius:4},
         ]
       },
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:10,padding:8,color:textColor}}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:textColor}},y:{stacked:true,grid:{color:gridColor},beginAtZero:true,ticks:{color:textColor}}}}
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'top',labels:{boxWidth:10,padding:8,color:textColor}},
+          tooltip:{callbacks:{label:ctx=>`  ${ctx.dataset.label}: ${ctx.raw}건`}}},
+        scales:{x:{stacked:true,grid:{display:false},ticks:{color:textColor}},
+                y:{stacked:true,grid:{color:gridColor},beginAtZero:true,ticks:{color:textColor,stepSize:1,precision:0}}}}
     });
   }
 
