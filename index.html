@@ -23,7 +23,7 @@
   --accent-blue:#2563eb;--accent-cyan:#06b6d4;--accent-gold:#f59e0b;
   --accent-red:#ef4444;--accent-green:#22c55e;--accent-purple:#a855f7;
   --shadow:0 8px 32px rgba(0,0,0,.4);
-  --nav-h:64px;--tab-h:52px;
+  --nav-h:64px;--filter-h:44px;--tab-h:52px;
 }
 body.light{
   --bg-primary:#f0f4f8;--bg-card:#ffffff;--bg-nav:#e8edf5;
@@ -55,8 +55,30 @@ header{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--nav-h);
   display:flex;align-items:center;justify-content:center;transition:all .2s}
 .icon-btn:hover{background:rgba(255,255,255,.18)}
 
+/* FILTER BAR */
+.filter-bar{position:fixed;top:var(--nav-h);left:0;right:0;z-index:98;height:var(--filter-h);
+  background:var(--bg-nav);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 14px;gap:6px;transition:background .3s}
+.filter-bar select{height:28px;padding:0 8px;border-radius:7px;border:1px solid var(--border);
+  background:var(--bg-card);color:var(--text-primary);font-size:.78rem;font-weight:600;
+  cursor:pointer;outline:none;transition:border-color .2s}
+.filter-bar select:hover{border-color:rgba(37,99,235,.5)}
+.filter-bar select:focus{border-color:var(--accent-blue)}
+body.light .filter-bar select{background:#fff}
+.filter-nav-btn{height:28px;width:28px;border-radius:7px;border:1px solid var(--border);
+  background:transparent;color:var(--text-muted);font-size:.85rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s}
+.filter-nav-btn:hover{background:rgba(37,99,235,.12);color:var(--text-primary);border-color:rgba(37,99,235,.4)}
+.filter-nav-btn:disabled{opacity:.35;cursor:default}
+.filter-sep{width:1px;height:20px;background:var(--border);margin:0 4px}
+.filter-lbl{font-size:.72rem;color:var(--text-dim);margin-right:4px;white-space:nowrap}
+.filter-session-count{font-size:.7rem;color:var(--text-dim);padding:3px 10px;border-radius:6px;
+  background:rgba(37,99,235,.07);border:1px solid rgba(37,99,235,.15);white-space:nowrap}
+.filter-cur-badge{font-size:.72rem;color:var(--accent-cyan);font-weight:700;padding:3px 10px;
+  border-radius:6px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);white-space:nowrap}
+
 /* NAV TABS */
-.nav-tabs{position:fixed;top:var(--nav-h);left:0;right:0;z-index:99;height:var(--tab-h);
+.nav-tabs{position:fixed;top:calc(var(--nav-h) + var(--filter-h));left:0;right:0;z-index:99;height:var(--tab-h);
   background:var(--bg-nav);border-bottom:1px solid var(--border);
   display:flex;align-items:center;overflow-x:auto;scrollbar-width:none;padding:0 8px;gap:4px;
   transition:background .3s}
@@ -77,7 +99,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--nav-h);
 .font-size-input[type=number]{-moz-appearance:textfield}
 
 /* MAIN */
-main{margin-top:calc(var(--nav-h) + var(--tab-h));padding:20px;max-width:1400px;margin-left:auto;margin-right:auto}
+main{margin-top:calc(var(--nav-h) + var(--filter-h) + var(--tab-h));padding:20px;max-width:1400px;margin-left:auto;margin-right:auto}
 .section{display:none}
 .section.active{display:block}
 
@@ -118,6 +140,11 @@ main{margin-top:calc(var(--nav-h) + var(--tab-h));padding:20px;max-width:1400px;
 .card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px;transition:background .3s,border .3s}
 .card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
 .card-title{font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.card.collapsed>.card-hdr{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.card.collapsed>*:not(.card-hdr){display:none!important}
+.collapse-btn{background:rgba(128,128,128,.07);border:1px solid var(--border);color:var(--text-muted);cursor:pointer;font-size:.75rem;font-weight:600;padding:4px 12px;border-radius:6px;margin-left:8px;transition:all .2s;white-space:nowrap;flex-shrink:0;line-height:1.6}
+.collapse-btn:hover{color:var(--accent-cyan);background:rgba(6,182,212,.08);border-color:rgba(6,182,212,.3)}
+.card.collapsed>.card-hdr{background:rgba(128,128,128,.03);border-radius:inherit}
 .cb{font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(37,99,235,.15);color:var(--accent-cyan)}
 
 /* TABLE */
@@ -253,6 +280,27 @@ body.light select.finp option{background:#fff;color:#0f172a}
 .fc-view-btn{height:30px;padding:0 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-muted);font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
 .fc-view-btn:hover{background:rgba(128,128,128,.1);color:var(--text-primary)}
 .fc-view-btn.active-view{background:rgba(37,99,235,.15);border-color:rgba(37,99,235,.4);color:var(--accent-cyan)}
+/* ISSUE TRACKER */
+.it-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
+.it-grid .full{grid-column:1/-1}
+.it-inp{width:100%;background:var(--bg-input,var(--bg-card));border:1px solid var(--border);border-radius:7px;padding:8px 11px;color:var(--text-primary);font-size:.88rem;box-sizing:border-box;font-family:inherit}
+.it-inp:focus{outline:none;border-color:var(--accent-cyan);box-shadow:0 0 0 2px rgba(6,182,212,.15)}
+.it-inp textarea{resize:vertical}
+.it-photo-strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.it-thumb{position:relative;width:84px;height:72px;border-radius:8px;overflow:hidden;border:1px solid var(--border);flex-shrink:0}
+.it-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.it-thumb .xt{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;line-height:18px;text-align:center;padding:0}
+.it-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:12px}
+.it-card-hdr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.it-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:4px 14px;font-size:.82rem;margin-bottom:8px}
+.it-problem{font-size:.85rem;white-space:pre-wrap;word-break:break-word;background:rgba(128,128,128,.07);border-radius:7px;padding:10px 12px;line-height:1.55}
+.it-photos{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.it-pview{width:110px;height:84px;border-radius:7px;overflow:hidden;border:1px solid var(--border);cursor:pointer;flex-shrink:0}
+.it-pview img{width:100%;height:100%;object-fit:cover;display:block}
+.it-badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.73rem;font-weight:700}
+.it-badge.접수{background:rgba(239,68,68,.15);color:#ef4444}
+.it-badge.처리중{background:rgba(245,158,11,.15);color:#f59e0b}
+.it-badge.완료{background:rgba(34,197,94,.15);color:#22c55e}
 </style>
 </head>
 <body>
@@ -262,7 +310,7 @@ body.light select.finp option{background:#fff;color:#0f172a}
     <div class="logo">Q</div>
     <div class="h-titles">
       <h1>품질 주간 회의</h1>
-      <p>AUTOMOTIVE PLASTIC PARTS · QUALITY MANAGEMENT</p>
+      <p>MIRAE · QUALITY MANAGEMENT</p>
     </div>
   </div>
   <div class="h-right">
@@ -277,15 +325,31 @@ body.light select.finp option{background:#fff;color:#0f172a}
   </div>
 </header>
 
+<div class="filter-bar" id="filterBar">
+  <span class="filter-lbl">📅 기간 조회</span>
+  <button class="filter-nav-btn" id="filterPrevBtn" onclick="filterNavWeek(-1)" title="이전 주">◀</button>
+  <select id="filterYear" onchange="onFilterYear()"><option value="">년도</option></select>
+  <select id="filterMonth" onchange="onFilterMonth()"><option value="">월</option></select>
+  <select id="filterWeek" onchange="onFilterWeek()"><option value="">주차</option></select>
+  <button class="filter-nav-btn" id="filterNextBtn" onclick="filterNavWeek(1)" title="다음 주">▶</button>
+  <button class="filter-nav-btn" id="filterDelBtn" onclick="deleteCurrentSession()" title="현재 주차 데이터 삭제" style="color:#f87171;margin-left:2px">🗑</button>
+  <div class="filter-sep"></div>
+  <span class="filter-cur-badge" id="filterCurBadge">현재 주차</span>
+  <span class="filter-session-count" id="filterSessionCount"></span>
+</div>
+
 <nav class="nav-tabs">
   <button class="tab-btn active" onclick="showTab('dashboard')" data-tab="dashboard"><span class="tab-dot"></span>종합 현황</button>
-  <button class="tab-btn" onclick="showTab('defect')" data-tab="defect"><span class="tab-dot"></span>불량 현황</button>
+  <button class="tab-btn" onclick="showTab('defect')" data-tab="defect"><span class="tab-dot"></span>선별불량 현황</button>
   <button class="tab-btn" onclick="showTab('claim')" data-tab="claim"><span class="tab-dot"></span>고객 클레임</button>
   <button class="tab-btn" onclick="showTab('fourm')" data-tab="fourm"><span class="tab-dot"></span>4M 변경점</button>
   <button class="tab-btn" onclick="showTab('improve')" data-tab="improve"><span class="tab-dot"></span>개선 활동</button>
   <button class="tab-btn" onclick="showTab('issues')" data-tab="issues"><span class="tab-dot"></span>주요 이슈</button>
   <button class="tab-btn" onclick="showTab('parts')" data-tab="parts"><span class="tab-dot"></span>품번/품명</button>
+  <button class="tab-btn" onclick="showTab('vendor-quality')" data-tab="vendor-quality"><span class="tab-dot"></span>업체별 품질현황</button>
   <button class="tab-btn" onclick="showTab('failcost')" data-tab="failcost"><span class="tab-dot"></span>실패비용 분석</button>
+  <button class="tab-btn" onclick="showTab('hold')" data-tab="hold"><span class="tab-dot"></span>Hold 현황</button>
+  <button class="tab-btn" onclick="showTab('issue-tracker')" data-tab="issue-tracker"><span class="tab-dot"></span>Issue Tracker</button>
   <div class="font-ctrl">
     <button class="font-btn" onclick="setFontSize(-1)" title="글자 작게">A−</button>
     <input class="font-size-input" id="fontSizeInput" type="number" min="70" max="150" step="5" value="100" onchange="setFontSizeInput(this.value)" title="글자 크기(%)">
@@ -302,12 +366,17 @@ body.light select.finp option{background:#fff;color:#0f172a}
   <div id="tab-improve" class="section"></div>
   <div id="tab-issues" class="section"></div>
   <div id="tab-parts" class="section"></div>
+  <div id="tab-vendor-quality" class="section"></div>
   <div id="tab-failcost" class="section"></div>
+  <div id="tab-hold" class="section"></div>
+  <div id="tab-issue-tracker" class="section"></div>
 </main>
 <datalist id="partsList"></datalist>
+<datalist id="vendorsList"></datalist>
+<datalist id="customersList"></datalist>
 
 <!-- MODAL -->
-<div id="modal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+<div id="modal" class="modal-overlay" onmousedown="_mdOnOverlay=(event.target===this)" onclick="if(_mdOnOverlay&&event.target===this)closeModal()">
   <div class="modal-box">
     <div class="modal-hdr">
       <h3 id="modalTitle">편집</h3>
@@ -492,8 +561,12 @@ async function pullFromFirestore() {
       const remote = JSON.parse(snap.data().json);
       Object.assign(DB, remote);
       localStorage.setItem('qm_data', JSON.stringify(DB));
+      _currentSessionId = getWeekId(DB);
+      persistCurrentSession();
       renderAll();
       setTimeout(initCharts, 100);
+      setTimeout(initCollapsible, 150);
+      renderFilterBar();
     }
     setSyncStatus('ok');
   } catch(e) { console.warn('Firestore pull failed:', e); setSyncStatus('error'); }
@@ -505,12 +578,272 @@ function loadData() {
     return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULTS));
   } catch(e) { return JSON.parse(JSON.stringify(DEFAULTS)); }
 }
+
+// ═══════════════════════════════════════════════
+// SESSION MANAGEMENT (년/월/주 필터)
+// ═══════════════════════════════════════════════
+function getWeekId(db) {
+  const m = (db.meeting.week || '').match(/(\d{4})년\s*(\d+)주차/);
+  if (m) return `${m[1]}-W${String(m[2]).padStart(2,'0')}`;
+  if (db.meeting.date) {
+    const d = new Date(db.meeting.date);
+    if (!isNaN(d)) return `${d.getFullYear()}-W${String(getWeekNum(d)).padStart(2,'0')}`;
+  }
+  return null;
+}
+
+function getSessionMeta(weekId, db) {
+  const [yr, wPart] = weekId.split('-W');
+  const wk = parseInt(wPart, 10);
+  // 해당 주의 월 계산: 주차 시작일(월요일) 기준
+  const jan1 = new Date(parseInt(yr, 10), 0, 1);
+  const dayOfWeek = jan1.getDay() || 7;
+  const startOfWeek = new Date(jan1);
+  startOfWeek.setDate(jan1.getDate() + (wk - 1) * 7 - (dayOfWeek - 1));
+  const month = startOfWeek.getMonth() + 1;
+  return { weekId, year: parseInt(yr, 10), month, week: wk, label: db.meeting.week || `${yr}년 ${wk}주차`, date: db.meeting.date || '' };
+}
+
+function loadSessionList() {
+  try {
+    const s = localStorage.getItem('qm_session_list');
+    return s ? JSON.parse(s) : [];
+  } catch(e) { return []; }
+}
+
+function saveSessionList(list) {
+  localStorage.setItem('qm_session_list', JSON.stringify(list));
+}
+
+function saveSessionData(weekId, db) {
+  try {
+    localStorage.setItem(`qm_sess_${weekId}`, JSON.stringify(db));
+  } catch(e) { console.warn('세션 저장 실패(용량 초과일 수 있음):', e); }
+}
+
+function loadSessionData(weekId) {
+  try {
+    const s = localStorage.getItem(`qm_sess_${weekId}`);
+    return s ? JSON.parse(s) : null;
+  } catch(e) { return null; }
+}
+
+async function pushSessionToFirestore(weekId, db) {
+  if (!_fdb) return;
+  try {
+    await _fdb.collection('qm').doc(`sess_${weekId}`).set({
+      json: JSON.stringify(db),
+      weekId,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) { console.warn('세션 Firestore 저장 실패:', e); }
+}
+
+async function pullSessionFromFirestore(weekId) {
+  if (!_fdb) return null;
+  try {
+    const snap = await _fdb.collection('qm').doc(`sess_${weekId}`).get();
+    if (snap.exists && snap.data().json) return JSON.parse(snap.data().json);
+  } catch(e) { console.warn('세션 Firestore 로드 실패:', e); }
+  return null;
+}
+
+async function pullSessionListFromFirestore() {
+  if (!_fdb) return;
+  try {
+    const snaps = await _fdb.collection('qm').where('weekId', '!=', null).get();
+    let changed = false;
+    const list = loadSessionList();
+    snaps.forEach(doc => {
+      const d = doc.data();
+      if (!d.weekId || !d.json) return;
+      if (!list.find(s => s.weekId === d.weekId)) {
+        try {
+          const db = JSON.parse(d.json);
+          list.push(getSessionMeta(d.weekId, db));
+          saveSessionData(d.weekId, db);
+          changed = true;
+        } catch(e) {}
+      }
+    });
+    if (changed) { saveSessionList(list); renderFilterBar(); }
+  } catch(e) { console.warn('세션 목록 Firestore 조회 실패:', e); }
+}
+
+let _currentSessionId = null;
+
+function persistCurrentSession() {
+  const weekId = getWeekId(DB);
+  if (!weekId) return;
+  _currentSessionId = weekId;
+  const wb = document.getElementById('weekBadge');
+  if (wb) wb.textContent = DB.meeting.week || weekId;
+  const list = loadSessionList();
+  const meta = getSessionMeta(weekId, DB);
+  const idx = list.findIndex(s => s.weekId === weekId);
+  if (idx >= 0) list[idx] = meta; else list.push(meta);
+  list.sort((a, b) => a.weekId < b.weekId ? 1 : -1);
+  saveSessionList(list);
+  saveSessionData(weekId, DB);
+  try { localStorage.setItem('qm_sess_vq_'+weekId, JSON.stringify(vqData)); } catch(e) {}
+  try { localStorage.setItem('qm_sess_fc_'+weekId, JSON.stringify(fcData)); } catch(e) {}
+  try { localStorage.setItem('qm_sess_sort_'+weekId, JSON.stringify(sortData)); } catch(e) {}
+  try { localStorage.setItem('qm_sess_hold_'+weekId, JSON.stringify(holdData)); } catch(e) {}
+  pushSessionToFirestore(weekId, DB);
+  renderFilterBar();
+}
+
+async function switchSession(weekId) {
+  // 먼저 localStorage 캐시에서 로드
+  let data = loadSessionData(weekId);
+  if (!data) {
+    setSyncStatus('syncing');
+    data = await pullSessionFromFirestore(weekId);
+    if (data) { saveSessionData(weekId, data); setSyncStatus('ok'); }
+    else { setSyncStatus('error'); alert('해당 주차 데이터를 찾을 수 없습니다.'); return; }
+  }
+  DB = data;
+  _currentSessionId = weekId;
+  localStorage.setItem('qm_data', JSON.stringify(DB));
+  // 세션별 파일 데이터 복원
+  try { const s = localStorage.getItem('qm_sess_vq_'+weekId); vqData = s ? JSON.parse(s) : null; } catch(e) { vqData = null; }
+  try { const s = localStorage.getItem('qm_sess_fc_'+weekId); fcData = s ? JSON.parse(s) : null; } catch(e) { fcData = null; }
+  try { const s = localStorage.getItem('qm_sess_sort_'+weekId); sortData = s ? JSON.parse(s) : null; } catch(e) { sortData = null; }
+  try { const s = localStorage.getItem('qm_sess_hold_'+weekId); holdData = s ? JSON.parse(s) : null; } catch(e) { holdData = null; }
+  try { localStorage.setItem('qm_vq_data', JSON.stringify(vqData)); } catch(e) {}
+  try { localStorage.setItem('qm_fc_data', JSON.stringify(fcData)); } catch(e) {}
+  try { localStorage.setItem('qm_sort_data', JSON.stringify(sortData)); } catch(e) {}
+  try { localStorage.setItem('qm_hold_data', JSON.stringify(holdData)); } catch(e) {}
+  document.getElementById('weekBadge').textContent = DB.meeting.week || weekId;
+  renderAll();
+  setTimeout(initCharts, 100);
+  setTimeout(initCollapsible, 150);
+  renderFilterBar();
+}
+
+function renderFilterBar() {
+  const list = loadSessionList();
+  const selYear  = document.getElementById('filterYear');
+  const selMonth = document.getElementById('filterMonth');
+  const selWeek  = document.getElementById('filterWeek');
+  if (!selYear) return;
+
+  const curId = _currentSessionId || getWeekId(DB);
+
+  // 년도 목록
+  const years = [...new Set(list.map(s => s.year))].sort((a,b) => b - a);
+  const curMeta = curId ? list.find(s => s.weekId === curId) : null;
+  const selY = selYear.value || (curMeta ? String(curMeta.year) : (years[0] ? String(years[0]) : ''));
+
+  selYear.innerHTML = '<option value="">년도</option>' +
+    years.map(y => `<option value="${y}"${String(y) === selY ? ' selected' : ''}>${y}년</option>`).join('');
+
+  // 월 목록 (선택된 년도 기준)
+  const months = selY
+    ? [...new Set(list.filter(s => String(s.year) === selY).map(s => s.month))].sort((a,b) => b - a)
+    : [];
+  const selM = selMonth.value || (curMeta && String(curMeta.year) === selY ? String(curMeta.month) : (months[0] ? String(months[0]) : ''));
+
+  selMonth.innerHTML = '<option value="">월</option>' +
+    months.map(m => `<option value="${m}"${String(m) === selM ? ' selected' : ''}>${m}월</option>`).join('');
+
+  // 주차 목록 (선택된 년도+월 기준)
+  const weeks = (selY && selM)
+    ? list.filter(s => String(s.year) === selY && String(s.month) === selM)
+          .sort((a,b) => b.week - a.week)
+    : [];
+  const selW = selWeek.value || (curMeta && String(curMeta.year) === selY && String(curMeta.month) === selM ? curMeta.weekId : (weeks[0] ? weeks[0].weekId : ''));
+
+  selWeek.innerHTML = '<option value="">주차</option>' +
+    weeks.map(w => `<option value="${w.weekId}"${w.weekId === selW ? ' selected' : ''}>${w.week}주차 (${w.label})</option>`).join('');
+
+  // 현재 배지
+  const badge = document.getElementById('filterCurBadge');
+  if (badge) badge.textContent = curMeta ? curMeta.label : (DB.meeting.week || '현재 주차');
+
+  // 세션 수
+  const cnt = document.getElementById('filterSessionCount');
+  if (cnt) cnt.textContent = list.length ? `총 ${list.length}주 저장됨` : '';
+
+  // 이전/다음 버튼 활성화
+  const allIds = list.map(s => s.weekId).sort();
+  const ci = allIds.indexOf(curId || '');
+  const prevBtn = document.getElementById('filterPrevBtn');
+  const nextBtn = document.getElementById('filterNextBtn');
+  if (prevBtn) prevBtn.disabled = ci <= 0;
+  if (nextBtn) nextBtn.disabled = ci < 0 || ci >= allIds.length - 1;
+}
+
+function onFilterYear() {
+  const selMonth = document.getElementById('filterMonth');
+  const selWeek  = document.getElementById('filterWeek');
+  if (selMonth) selMonth.value = '';
+  if (selWeek)  selWeek.value  = '';
+  renderFilterBar();
+}
+
+function onFilterMonth() {
+  const selWeek = document.getElementById('filterWeek');
+  if (selWeek) selWeek.value = '';
+  renderFilterBar();
+}
+
+function onFilterWeek() {
+  const weekId = document.getElementById('filterWeek').value;
+  if (!weekId) return;
+  const curId = _currentSessionId || getWeekId(DB);
+  if (weekId === curId) return;
+  switchSession(weekId);
+}
+
+function filterNavWeek(dir) {
+  const list = loadSessionList();
+  const allIds = list.map(s => s.weekId).sort();
+  const curId = _currentSessionId || getWeekId(DB);
+  const ci = allIds.indexOf(curId || '');
+  const ni = ci + dir;
+  if (ni < 0 || ni >= allIds.length) return;
+  switchSession(allIds[ni]);
+}
+
+function deleteCurrentSession() {
+  const weekId = _currentSessionId || getWeekId(DB);
+  if (!weekId) { alert('삭제할 주차가 선택되지 않았습니다.'); return; }
+  const list = loadSessionList();
+  const meta = list.find(s => s.weekId === weekId);
+  const label = meta ? meta.label : weekId;
+  if (!confirm(`"${label}" 주차 데이터를 삭제하시겠습니까?\n\n업로드된 파일 데이터도 함께 삭제되며 되돌릴 수 없습니다.`)) return;
+  // 목록에서 제거
+  const newList = list.filter(s => s.weekId !== weekId);
+  saveSessionList(newList);
+  // localStorage 항목 모두 제거
+  ['','_vq','_fc','_sort','_hold'].forEach(suffix => {
+    localStorage.removeItem('qm_sess'+suffix+'_'+weekId);
+  });
+  // 나머지 세션 중 가장 최근으로 이동, 없으면 초기화
+  if (newList.length > 0) {
+    const sorted = [...newList].sort((a,b) => b.weekId < a.weekId ? -1 : 1);
+    switchSession(sorted[0].weekId);
+  } else {
+    DB = JSON.parse(JSON.stringify(DEFAULTS));
+    vqData = null; fcData = null; sortData = null; holdData = null;
+    _currentSessionId = null;
+    ['qm_data','qm_vq_data','qm_fc_data','qm_sort_data','qm_hold_data'].forEach(k => localStorage.removeItem(k));
+    renderAll();
+    setTimeout(initCharts, 100);
+    setTimeout(initCollapsible, 150);
+    renderFilterBar();
+  }
+}
+
 function saveData() {
   localStorage.setItem('qm_data', JSON.stringify(DB));
+  persistCurrentSession();
   pushToFirestore();
 }
 function exportData() {
-  const blob = new Blob([JSON.stringify(DB, null, 2)], {type:'application/json'});
+  const payload = Object.assign({}, DB, { _vqData: vqData });
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `quality_data_${DB.meeting.week.replace(/[^0-9]/g,'')}.json`;
@@ -549,6 +882,7 @@ function openNewMeetingDialog() {
 
 function startBlank() {
   if (!confirm('현재 모든 데이터가 삭제됩니다. 계속하시겠습니까?')) return;
+  vqData = null; fcData = null; sortData = null; holdData = null;
   const today = new Date();
   const wk = getWeekNum(today);
   const yr = today.getFullYear();
@@ -589,7 +923,7 @@ function startBlank() {
       {id:2,icon:'✅',label:'이번주 완료',value:'—',sub:'',trendType:'flat',trendVal:'—',color:'#2563eb'},
       {id:3,icon:'⏰',label:'지연 과제',value:'—',sub:'',trendType:'flat',trendVal:'—',color:'#f59e0b'},
     ],
-    improvements:[], issues:[], actions:[], schedule:[], parts:[],
+    improvements:[], issues:[], actions:[], schedule:[], parts:[], issueTracker:[],
   };
   saveData(); closeModal();
   document.getElementById('modalSave').style.display = '';
@@ -617,7 +951,10 @@ function importData(e) {
     try {
       const parsed = JSON.parse(evt.target.result);
       if (!parsed.meeting) throw new Error('형식 오류');
+      vqData = parsed._vqData || null;
+      delete parsed._vqData;
       DB = parsed;
+      try { localStorage.setItem('qm_vq_data', JSON.stringify(vqData)); } catch(e) {}
       saveData(); refresh();
       alert('데이터를 성공적으로 불러왔습니다.');
     } catch(err) {
@@ -694,25 +1031,36 @@ const SCHEMA = {
     {k:'trendVal',l:'추이 표시 문자',t:'text'},
     {k:'color',l:'색상',t:'color'},
   ],
+  vendor:[
+    {k:'name',l:'업체명',t:'text'},{k:'contact',l:'담당자',t:'text'},
+    {k:'phone',l:'연락처',t:'text'},{k:'note',l:'비고',t:'text'},
+  ],
+  customer:[
+    {k:'name',l:'고객사명',t:'text'},
+    {k:'contact',l:'담당자',t:'text'},{k:'note',l:'비고',t:'text'},
+  ],
+  price:[
+    {k:'partNo',l:'품번',t:'text'},{k:'partName',l:'품명',t:'text'},
+    {k:'costUnit',l:'단가 (원/개)',t:'number'},
+    {k:'note',l:'비고',t:'text'},
+  ],
   line:[
-    {k:'name',l:'업체명',t:'text'},{k:'product',l:'생산품목',t:'partslist'},
+    {k:'name',l:'업체명',t:'vendorslist'},{k:'product',l:'생산품목',t:'partslist'},
     {k:'produced',l:'생산수량',t:'number'},{k:'defects',l:'불량수량',t:'number'},
     {k:'rework',l:'재작업 수량',t:'number'},{k:'scrap',l:'폐기 수량',t:'number'},
-    {k:'reworkCostUnit',l:'재작업 개당 비용 (원)',t:'number'},
-    {k:'scrapCostUnit', l:'폐기 개당 비용 (원)', t:'number'},
-    {k:'extraCost',     l:'기타 실패 비용 (원)', t:'number'},
+    {k:'extraCost',l:'기타 실패 비용 (원)',t:'number'},
     {k:'prevDefects',l:'전주 불량수량',t:'number'},{k:'target',l:'불량률 목표(%)',t:'number'},
   ],
   defect:[
     {k:'type',l:'불량 유형',t:'text'},{k:'count',l:'발생수',t:'number'},
     {k:'pct',l:'비율(%)',t:'number'},{k:'trend',l:'추이',t:'select',opts:['up','down','flat']},
-    {k:'line',l:'업체명',t:'text'},{k:'partInfo',l:'품번/품명',t:'partslist'},
+    {k:'line',l:'업체명',t:'vendorslist'},{k:'partInfo',l:'품번/품명',t:'partslist'},
   ],
   defectDist:[
     {k:'label',l:'유형명',t:'text'},{k:'pct',l:'비율(%)',t:'number'},{k:'color',l:'색상',t:'color'},
   ],
   claim:[
-    {k:'no',l:'클레임 번호',t:'text'},{k:'customer',l:'고객사',t:'text'},
+    {k:'no',l:'클레임 번호',t:'text'},{k:'customer',l:'고객사',t:'customerslist'},
     {k:'model',l:'차종',t:'text'},{k:'part',l:'품번/품명',t:'partslist'},
     {k:'defect',l:'불량내용',t:'textarea'},{k:'received',l:'접수일',t:'date'},
     {k:'deadline',l:'D/L (날짜 또는 텍스트)',t:'text'},{k:'stage',l:'진행단계',t:'text'},
@@ -721,7 +1069,7 @@ const SCHEMA = {
   fourm:[
     {k:'no',l:'번호',t:'text'},
     {k:'type',l:'M 구분',t:'select',opts:['Man','Machine','Material','Method']},
-    {k:'line',l:'업체명',t:'text'},{k:'partInfo',l:'품번/품명',t:'partslist'},
+    {k:'line',l:'업체명',t:'vendorslist'},{k:'partInfo',l:'품번/품명',t:'partslist'},
     {k:'content',l:'변경 내용',t:'textarea'},
     {k:'date',l:'변경일',t:'date'},{k:'reason',l:'사유',t:'text'},
     {k:'verify',l:'검증 상태',t:'select',opts:['검증 완료','검증 진행중','검증 중단','초물 검사 대기']},
@@ -729,7 +1077,7 @@ const SCHEMA = {
   ],
   part:[
     {k:'partNo',l:'품번',t:'text'},{k:'partName',l:'품명',t:'text'},
-    {k:'maker',l:'고객사',t:'text'},{k:'model',l:'차종/모델',t:'text'},
+    {k:'maker',l:'고객사',t:'customerslist'},{k:'model',l:'차종/모델',t:'text'},
     {k:'unit',l:'단위',t:'text'},{k:'note',l:'비고',t:'text'},
   ],
   improvement:[
@@ -772,6 +1120,7 @@ const SCHEMA = {
 // MODAL SYSTEM
 // ═══════════════════════════════════════════════
 let _modalSave = null;
+let _mdOnOverlay = false;
 
 function openModal(title, schema, record, onSave) {
   document.getElementById('modalTitle').textContent = title;
@@ -781,6 +1130,10 @@ function openModal(title, schema, record, onSave) {
     let input = '';
     if (f.t === 'partslist') {
       input = `<input type="text" class="finp" data-key="${f.k}" value="${esc(v)}" list="partsList" placeholder="품번 검색 또는 직접 입력…" autocomplete="off">`;
+    } else if (f.t === 'vendorslist') {
+      input = `<input type="text" class="finp" data-key="${f.k}" value="${esc(v)}" list="vendorsList" placeholder="업체명 검색 또는 직접 입력…" autocomplete="off">`;
+    } else if (f.t === 'customerslist') {
+      input = `<input type="text" class="finp" data-key="${f.k}" value="${esc(v)}" list="customersList" placeholder="고객사 검색 또는 직접 입력…" autocomplete="off">`;
     } else if (f.t === 'select') {
       input = `<select class="finp" data-key="${f.k}">${f.opts.map(o=>`<option value="${esc(o)}"${o==v?' selected':''}>${esc(o)}</option>`).join('')}</select>`;
     } else if (f.t === 'textarea') {
@@ -857,42 +1210,47 @@ function actCell(editFn, delFn) {
 // RENDER — DASHBOARD
 // ═══════════════════════════════════════════════
 function calcDashboardKpi() {
-  const lines = DB.lines || [];
-  const totalProd = lines.reduce((s,l) => s + (+l.produced||0), 0);
-  const totalDef  = lines.reduce((s,l) => s + (+l.defects||0), 0);
-  const totalPrev = lines.reduce((s,l) => s + (+l.prevDefects||0), 0);
-  const hasData   = totalProd > 0;
-
-  const currRate  = hasData ? totalDef / totalProd * 100 : null;
-  const prevRate  = hasData && totalPrev > 0 ? totalPrev / totalProd * 100 : null;
-  const avgTarget = lines.length > 0 ? lines.reduce((s,l)=>s+(+l.target||0),0)/lines.length : 0.5;
-
-  const diff      = (currRate !== null && prevRate !== null) ? Math.abs(currRate - prevRate).toFixed(2) : null;
-  const improved  = diff !== null && currRate < prevRate;
-  const worsened  = diff !== null && currRate > prevRate;
-  const defTrend  = improved ? 'down' : worsened ? 'up' : 'flat';
-
   const activeClaims = (DB.claims||[]).filter(c => c.status !== '완결').length;
   const newClaims    = (DB.claims||[]).filter(c => c.status === '신규').length;
   const carryOver    = (DB.claims||[]).filter(c => c.status === '진행중').length;
   const urgentCount  = (DB.issues||[]).filter(x => x.priority === '긴급').length;
 
+  // 실패비용 분석 탭 데이터 사용 (fcData 업로드 우선, 없으면 DB.lines calcFailureCosts)
+  let _fcTotal = 0, _fcCount = 0, _fcSub = '실패비용 탭에서 파일을 업로드하거나 단가를 입력하세요';
+  if (fcData && fcData.rows && fcData.rows.length) {
+    const _fca = buildFcAnalysis(fcData);
+    _fcTotal = _fca.grandTotalCost;
+    _fcCount = _fca.parts.filter(p=>p.totalCost>0).length;
+    _fcSub = `불량수량×단가 합계 · ${_fca.parts.length}개 품번`;
+  } else {
+    const _fc = calcFailureCosts();
+    _fcTotal = _fc.reduce((s,c)=>s+c.total, 0);
+    _fcCount = _fc.filter(c=>c.total>0).length;
+    if (_fcTotal > 0) _fcSub = `재작업+폐기+기타 · ${_fcCount}개 업체`;
+  }
+
+  // 업체별 품질현황 파일 데이터 (총 불량 수량용)
+  const vqa = (vqData && vqData.rows && vqData.rows.length) ? buildVqAnalysis(vqData) : null;
+  const hasQty  = vqa && vqa.grandTotalQty  > 0;
+
   return [
     {
-      icon: DB.kpi[0]?.icon||'📊', color: DB.kpi[0]?.color||'#2563eb',
-      label: '주간 종합 불량률',
-      value: currRate !== null ? currRate.toFixed(2)+'%' : '—',
-      sub: hasData ? `목표: ${avgTarget.toFixed(2)}% 이하 / 전주 대비 ${diff!==null?(improved?'▼ ':'▲ ')+diff+'%p':'—'}` : '업체별 현황 탭에 데이터를 입력하세요',
-      trendType: defTrend,
-      trendVal: diff !== null ? (improved?'▼ ':'▲ ')+diff+'%p' : '—',
+      icon: DB.kpi[0]?.icon||'💰', color: DB.kpi[0]?.color||'#2563eb',
+      label: '총 실패 비용',
+      value: _fcTotal > 0 ? fmtWon(_fcTotal) : '—',
+      sub: _fcTotal > 0 ? _fcSub : '실패비용 탭에서 파일을 업로드하거나 단가를 입력하세요',
+      trendType: _fcTotal > 0 ? 'up' : 'flat',
+      trendVal: _fcTotal > 0 ? `${_fcCount}개 품번` : '— 미입력',
     },
     {
       icon: DB.kpi[1]?.icon||'🏭', color: DB.kpi[1]?.color||'#22c55e',
-      label: '공정 수율',
-      value: currRate !== null ? (100-currRate).toFixed(2)+'%' : '—',
-      sub: hasData ? `목표: ${(100-avgTarget).toFixed(2)}% 이상` : '업체별 현황 탭에 데이터를 입력하세요',
-      trendType: improved ? 'down' : worsened ? 'up' : 'flat',
-      trendVal: diff !== null ? (improved?'▲ ':'▼ ')+diff+'%p' : '—',
+      label: '총 불량 수량',
+      value: hasQty ? vqa.grandTotalQty.toLocaleString()+'개' : '—',
+      sub: hasQty
+        ? `${vqa.rowCount.toLocaleString()}행 분석 · ${vqa.vendors[0]?.name||''} 최다`
+        : '업체별 품질현황 탭에서 파일을 업로드하세요',
+      trendType: hasQty ? 'up' : 'flat',
+      trendVal: hasQty ? `${vqa.vendors.length}개 업체` : '— 미업로드',
     },
     {
       icon: DB.kpi[2]?.icon||'🚗', color: DB.kpi[2]?.color||'#f59e0b',
@@ -913,16 +1271,32 @@ function calcDashboardKpi() {
   ];
 }
 
+function lookupUnitCost(product) {
+  if (!product || !PRICE_MASTER.length) return null;
+  const p = String(product).toLowerCase().trim();
+  return PRICE_MASTER.find(m => {
+    const pNo   = (m.partNo   || '').toLowerCase().trim();
+    const pName = (m.partName || '').toLowerCase().trim();
+    return (pNo   && (p.includes(pNo)   || pNo.includes(p)))   ||
+           (pName && (p.includes(pName) || pName.includes(p)));
+  }) || null;
+}
+
 function calcFailureCosts() {
   return (DB.lines || []).map(l => {
-    const rework     = +l.rework     || 0;
-    const scrap      = +l.scrap      || 0;
-    const reworkCost = rework * (+l.reworkCostUnit || 0);
-    const scrapCost  = scrap  * (+l.scrapCostUnit  || 0);
-    const extra      = +l.extraCost  || 0;
+    const rework     = +l.rework || 0;
+    const scrap      = +l.scrap  || 0;
+    const priceEntry = lookupUnitCost(l.product);
+    const baseUnit   = priceEntry ? +priceEntry.costUnit : 0;
+    const reworkUnit = priceEntry ? baseUnit * 2 : (+l.reworkCostUnit || 0);
+    const scrapUnit  = priceEntry ? baseUnit     : (+l.scrapCostUnit  || 0);
+    const reworkCost = rework * reworkUnit;
+    const scrapCost  = scrap  * scrapUnit;
+    const extra      = +l.extraCost || 0;
     const total      = reworkCost + scrapCost + extra;
     return { id: l.id, name: l.name, product: l.product,
-             rework, scrap, reworkCost, scrapCost, extra, total };
+             rework, scrap, reworkUnit, scrapUnit, reworkCost, scrapCost, extra, total,
+             fromMaster: !!priceEntry };
   }).sort((a, b) => b.total - a.total);
 }
 
@@ -931,6 +1305,34 @@ function fmtWon(n) {
 }
 
 function calcDefectKpi() {
+  // 선별실적 파일 데이터 우선 사용
+  if (sortData && sortData.rows && sortData.rows.length) {
+    const a = buildSortAnalysis(sortData);
+    const top = a.defectTypeList[0];
+    return [
+      { icon:'🔍', color:'#2563eb', label:'총 검사수량',
+        value: a.totalInspQty.toLocaleString()+'개',
+        sub: `${a.rowCount.toLocaleString()}행 · ${esc(sortData.fileName||'—')}`,
+        trendType:'flat', trendVal:'— 실측' },
+      { icon:'⚠️', color:'#ef4444', label:'총 불량수량',
+        value: a.totalDefectQty.toLocaleString()+'개',
+        sub: top ? `최다 불량: ${top.type} (${top.count.toLocaleString()}개)` : '불량 없음',
+        trendType: a.totalDefectQty > 0 ? 'up' : 'flat',
+        trendVal: a.totalDefectQty > 0 ? '▲ 확인필요' : '— 양호' },
+      { icon:'📉', color:'#f59e0b', label:'불량율(PPM)',
+        value: a.avgPpm.toLocaleString(),
+        sub: `검사수량 ${a.totalInspQty.toLocaleString()}개 기준`,
+        trendType: a.avgPpm > 0 ? 'up' : 'flat',
+        trendVal: a.avgPpm > 0 ? '▲ 관리필요' : '— 양호' },
+      { icon:'💸', color:'#a855f7', label:'불량 금액',
+        value: a.totalDefectAmt > 0 ? fmtWon(a.totalDefectAmt) : '—',
+        sub: a.totalDefectAmt > 0 ? `${a.parts.length}개 품목 집계` : '금액 열 매핑을 확인하세요',
+        trendType: a.totalDefectAmt > 0 ? 'up' : 'flat',
+        trendVal: a.totalDefectAmt > 0 ? '— 실측값' : '— 미입력' },
+    ];
+  }
+
+  // fallback: DB.lines 기반
   const lines    = DB.lines || [];
   const totalDef  = lines.reduce((s,l)=>s+(+l.defects||0), 0);
   const totalPrev = lines.reduce((s,l)=>s+(+l.prevDefects||0), 0);
@@ -941,33 +1343,25 @@ function calcDefectKpi() {
   return [
     { icon:'🔴', color:'#ef4444', label:'총 불량 수량',
       value: totalDef.toLocaleString()+'개',
-      sub: totalPrev>0 ? `전주: ${totalPrev.toLocaleString()}개 대비 ${diff>0?'+':''}${diff}개` : '전주 불량수량을 입력하세요',
+      sub: totalPrev>0 ? `전주: ${totalPrev.toLocaleString()}개 대비 ${diff>0?'+':''}${diff}개` : '선별실적 파일을 업로드하세요',
       trendType: diff<0?'down':diff>0?'up':'flat',
       trendVal: diff!==0?(diff<0?'▼ ':'▲ ')+Math.abs(diff)+'개':'—' },
     { icon:'🔁', color:'#f59e0b', label:'재작업 수량',
       value: hasRework ? totalRework.toLocaleString()+'개' : '미입력',
-      sub: hasRework
-        ? `총 불량 대비 ${totalDef>0?(totalRework/totalDef*100).toFixed(1):'—'}%`
-        : '업체별 현황 → ✏ 버튼에서 입력',
+      sub: hasRework ? `총 불량 대비 ${totalDef>0?(totalRework/totalDef*100).toFixed(1):'—'}%` : '선별실적 파일을 업로드하세요',
       trendType:'flat', trendVal: hasRework?'— 실측':'— 미입력' },
     { icon:'🗑️', color:'#ef4444', label:'폐기 수량',
       value: hasRework ? totalScrap.toLocaleString()+'개' : '미입력',
-      sub: hasRework
-        ? `폐기율: ${totalDef>0?(totalScrap/totalDef*100).toFixed(1):'—'}%`
-        : '업체별 현황 → ✏ 버튼에서 입력',
-      trendType: totalScrap>0?'up':'flat',
-      trendVal: hasRework?(totalScrap>0?'▲ 확인필요':'— 없음'):'— 미입력' },
+      sub: hasRework ? `폐기율: ${totalDef>0?(totalScrap/totalDef*100).toFixed(1):'—'}%` : '선별실적 파일을 업로드하세요',
+      trendType: totalScrap>0?'up':'flat', trendVal: hasRework?(totalScrap>0?'▲ 확인필요':'— 없음'):'— 미입력' },
     (() => {
       const costs = calcFailureCosts();
       const grandTotal = costs.reduce((s,c) => s + c.total, 0);
       const hasCost = costs.some(c => c.total > 0);
       return { icon:'💰', color:'#a855f7', label:'불량 손실 비용',
         value: hasCost ? fmtWon(grandTotal) : '미입력',
-        sub: hasCost
-          ? `재작업+폐기+기타 비용 합계 (${costs.filter(c=>c.total>0).length}개 업체)`
-          : '업체별 현황 ✏ 에서 비용 단가를 입력하세요',
-        trendType: hasCost ? 'up' : 'flat',
-        trendVal: hasCost ? '— 실측값' : '— 미입력' };
+        sub: hasCost ? `재작업+폐기+기타 비용 합계 (${costs.filter(c=>c.total>0).length}개 업체)` : '선별실적 파일을 업로드하세요',
+        trendType: hasCost ? 'up' : 'flat', trendVal: hasCost ? '— 실측값' : '— 미입력' };
     })(),
   ];
 }
@@ -1044,26 +1438,175 @@ function autoKpiHtml(items) {
     </div>`).join('')}</div>`;
 }
 
+// ─── 주간/월간 자동 집계 ───────────────────────────────────
+function calcWeeklyTrendData() {
+  const list = loadSessionList();
+  if (!list.length) return { labels:[], defectQty:[], inspQty:[], ppm:[] };
+  const sorted = [...list].sort((a,b)=>a.weekId>b.weekId?-1:1).slice(0,12).reverse();
+  const labels=[], defectQty=[], inspQty=[], ppm=[];
+  sorted.forEach(s=>{
+    let dq=0, iq=0, pp=0;
+    try {
+      const raw=localStorage.getItem('qm_sess_sort_'+s.weekId);
+      const sd=raw?JSON.parse(raw):null;
+      if(sd&&sd.rows&&sd.rows.length){
+        const a=buildSortAnalysis(sd); dq=a.totalDefectQty; iq=a.totalInspQty; pp=a.avgPpm;
+      } else {
+        const db=loadSessionData(s.weekId);
+        if(db) dq=(db.lines||[]).reduce((acc,l)=>acc+(+l.defects||0),0);
+      }
+    } catch(e){}
+    labels.push(s.label?s.label.replace(/\d{4}년\s*/,''):s.weekId);
+    defectQty.push(dq); inspQty.push(iq); ppm.push(pp);
+  });
+  return {labels,defectQty,inspQty,ppm};
+}
+
+function calcMonthlyTrendData() {
+  const list = loadSessionList();
+  if (!list.length) return { labels:[], defectQty:[], inspQty:[], ppm:[] };
+  const byMonth = new Map();
+  list.forEach(s=>{
+    const key=`${s.year}-${String(s.month).padStart(2,'0')}`;
+    if(!byMonth.has(key)) byMonth.set(key,{label:`${s.month}월`,dq:0,iq:0});
+    const m=byMonth.get(key);
+    try {
+      const raw=localStorage.getItem('qm_sess_sort_'+s.weekId);
+      const sd=raw?JSON.parse(raw):null;
+      if(sd&&sd.rows&&sd.rows.length){
+        const a=buildSortAnalysis(sd); m.dq+=a.totalDefectQty; m.iq+=a.totalInspQty;
+      } else {
+        const db=loadSessionData(s.weekId);
+        if(db) m.dq+=(db.lines||[]).reduce((acc,l)=>acc+(+l.defects||0),0);
+      }
+    } catch(e){}
+  });
+  const entries=[...byMonth.entries()].sort(([a],[b])=>a>b?1:-1).slice(-12);
+  const labels=[], defectQty=[], inspQty=[], ppm=[];
+  entries.forEach(([,v])=>{
+    labels.push(v.label);
+    defectQty.push(v.dq); inspQty.push(v.iq);
+    ppm.push(v.iq>0?Math.round(v.dq/v.iq*1000000):0);
+  });
+  return {labels,defectQty,inspQty,ppm};
+}
+
+// ─── 탭별 현황 요약 카드 ──────────────────────────────────
+function buildTabSummaryHtml() {
+  // 불량 현황
+  let defectVal, defectSub, defectColor;
+  if(sortData&&sortData.rows&&sortData.rows.length){
+    const a=buildSortAnalysis(sortData);
+    defectVal='PPM '+a.avgPpm.toLocaleString();
+    defectSub='불량 '+a.totalDefectQty.toLocaleString()+'개';
+    defectColor=a.avgPpm>5000?'#ef4444':a.avgPpm>2000?'#f59e0b':'#22c55e';
+  } else {
+    const tot=(DB.lines||[]).reduce((s,l)=>s+(+l.defects||0),0);
+    defectVal=tot>0?tot.toLocaleString()+'개':'—';
+    defectSub='선별실적 미업로드';
+    defectColor=tot>0?'#f59e0b':'#64748b';
+  }
+  // 클레임
+  const claims=DB.claims||[];
+  const activeCl=claims.filter(c=>c.status!=='완결').length;
+  const doneCl=claims.filter(c=>c.status==='완결').length;
+  const clColor=activeCl>3?'#ef4444':activeCl>0?'#f59e0b':'#22c55e';
+  // 4M
+  const fourm=DB.fourm||[];
+  const pend4M=fourm.filter(f=>f.approval!=='승인').length;
+  const fourMColor=pend4M>5?'#ef4444':pend4M>0?'#f59e0b':'#22c55e';
+  // 개선 활동
+  const improv=DB.improvements||[];
+  const delayed=improv.filter(x=>x.status==='지연').length;
+  const inProg=improv.filter(x=>x.status==='진행중').length;
+  const doneImp=improv.filter(x=>x.status==='완료').length;
+  const impColor=delayed>0?'#ef4444':inProg>0?'#f59e0b':'#22c55e';
+  // 일정
+  const sched=DB.schedule||[];
+  const schedUrgent=sched.filter(x=>['긴급','D/L','최우선'].includes(x.priority)).length;
+  const schedImport=sched.filter(x=>x.priority==='중요').length;
+  const schedNormal=sched.filter(x=>['일반','만회'].includes(x.priority)).length;
+  const schedColor=schedUrgent>0?'#ef4444':schedImport>0?'#f59e0b':sched.length>0?'#22c55e':'#64748b';
+  const schedSubParts=[];
+  if(schedUrgent>0) schedSubParts.push('긴급·D/L '+schedUrgent+'건');
+  if(schedImport>0) schedSubParts.push('중요 '+schedImport+'건');
+  if(schedNormal>0) schedSubParts.push('일반 '+schedNormal+'건');
+  const schedSub=schedSubParts.length>0?schedSubParts.join(' · '):'등록된 일정 없음';
+  // 업체별 품질
+  const vqa=(vqData&&vqData.rows&&vqData.rows.length)?buildVqAnalysis(vqData):null;
+  const vqColor=vqa?(vqa.grandTotalCost>1000000?'#f59e0b':'#22c55e'):'#64748b';
+  // 실패비용 (fcData 업로드 우선, 없으면 DB.lines)
+  let totalCost=0, fcPartCount=0;
+  if (fcData && fcData.rows && fcData.rows.length) {
+    const _fca2=buildFcAnalysis(fcData);
+    totalCost=_fca2.grandTotalCost;
+    fcPartCount=_fca2.parts.length;
+  } else {
+    const costs=calcFailureCosts();
+    totalCost=costs.reduce((s,c)=>s+c.total,0);
+    fcPartCount=costs.filter(c=>c.total>0).length;
+  }
+  const costColor=totalCost>500000?'#f59e0b':totalCost>0?'#22c55e':'#64748b';
+
+  // Hold 현황
+  let holdVal='미업로드', holdSub='파일 업로드 필요', holdColor='#64748b';
+  if (holdData && holdData.rows && holdData.rows.length) {
+    const _ha = buildHoldAnalysis(holdData);
+    holdVal  = _ha.totalQty.toLocaleString()+'개';
+    holdColor = _ha.waitQty>0 ? '#ef4444' : _ha.releaseRate>=100 ? '#22c55e' : '#f59e0b';
+    const _holdParts = [];
+    if (_ha.waitQty>0)    _holdParts.push('대기 '+_ha.waitQty+'개');
+    if (_ha.releaseQty>0) _holdParts.push('해제 '+_ha.releaseQty+'개');
+    if (_ha.totalCost>0)  _holdParts.push(fmtWon(_ha.totalCost));
+    holdSub = _holdParts.length>0 ? _holdParts.join(' · ') : _ha.totalCount+'건';
+  }
+
+  const cards=[
+    {icon:'⚠️', label:'불량 현황',    val:defectVal,    sub:defectSub,                                              color:defectColor, tab:'defect'},
+    {icon:'🚗', label:'클레임 현황',  val:activeCl+'건 진행중', sub:'전체 '+claims.length+'건 · 완결 '+doneCl+'건', color:clColor,     tab:'claim'},
+    {icon:'🔄', label:'4M 변경점',    val:'전체 '+fourm.length+'건', sub:'미완료 '+pend4M+'건',                     color:fourMColor,  tab:'fourm'},
+    {icon:'📈', label:'개선 활동',    val:'진행 '+inProg+'건', sub:'지연 '+delayed+'건 · 완료 '+doneImp+'건',       color:impColor,    tab:'improve'},
+    {icon:'📅', label:'일정 현황',    val:sched.length>0?sched.length+'건':'없음', sub:schedSub, color:schedColor,  tab:'issues'},
+    {icon:'🏭', label:'업체별 품질',  val:vqa?vqa.vendors.length+'개사':'미업로드', sub:vqa?'총 '+vqa.grandTotalQty.toLocaleString()+'개':'파일 업로드 필요', color:vqColor, tab:'vendor-quality'},
+    {icon:'💰', label:'실패 비용',    val:totalCost>0?fmtWon(totalCost):'미입력', sub:fcPartCount+'개 품번 집계',  color:costColor,   tab:'failcost'},
+    {icon:'🔒', label:'Hold 현황',    val:holdVal, sub:holdSub, color:holdColor, tab:'hold'},
+  ];
+
+  return `<div style="margin-bottom:20px">
+    <div style="font-size:.72rem;font-weight:700;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">📊 탭별 현황 요약</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">
+      ${cards.map(c=>`<div onclick="showTab('${c.tab}')" style="cursor:pointer;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 12px;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0,0,0,.3)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${c.color}"></div>
+        <div style="font-size:1.4rem;margin-bottom:6px">${c.icon}</div>
+        <div style="font-size:.68rem;color:var(--text-dim);margin-bottom:4px">${esc(c.label)}</div>
+        <div style="font-size:.95rem;font-weight:700;color:${c.color}">${esc(c.val)}</div>
+        <div style="font-size:.65rem;color:var(--text-muted);margin-top:3px;line-height:1.4">${esc(c.sub)}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
 function renderDashboard() {
   const m = DB.meeting;
-  const linesHtml = DB.lines.map((l,i) => {
-    const r = defRate(l);
-    const st = lineStatus(l);
-    const rColor = r > l.target ? '#f87171' : r > l.target*0.9 ? '#fbbf24' : '#4ade80';
-    return `<tr>
-      <td><strong>${esc(l.name)}</strong></td>
-      <td>${esc(l.product)}</td>
-      <td>${l.produced.toLocaleString()}개</td>
-      <td>${l.defects.toLocaleString()}개</td>
-      <td style="color:${(+l.rework||0)>0?'#fbbf24':'var(--text-dim)'}">${(+l.rework||0)>0?(+l.rework).toLocaleString()+'개':'—'}</td>
-      <td style="color:${(+l.scrap||0)>0?'#f87171':'var(--text-dim)'}">${(+l.scrap||0)>0?(+l.scrap).toLocaleString()+'개':'—'}</td>
-      <td><strong style="color:${rColor}">${r.toFixed(2)}%</strong></td>
-      <td>${l.target.toFixed(2)}%</td>
-      <td>${(100-r).toFixed(2)}%</td>
-      <td>${badge(st)}</td>
-      <td>${actCell(`editLine(${l.id})`,`delRow('lines',${l.id})`)}</td>
-    </tr>`;
-  }).join('');
+  const _DPAL = ['#ef4444','#f59e0b','#22c55e','#2563eb','#a855f7','#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6'];
+  let _donutItems, _donutAddBtn = '', _donutSource;
+  if (sortData && sortData.rows && sortData.rows.length) {
+    const _da = buildSortAnalysis(sortData);
+    const _top = _da.defectTypeList.slice(0, 10);
+    const _tot = _da.totalDefectQty || 1;
+    _donutItems = _top.map((d,i) => {
+      const c = _DPAL[i % _DPAL.length];
+      const p = (d.count / _tot * 100).toFixed(1);
+      return '<div class="dl-item"><div class="dl-dot" style="background:'+c+'"></div><span>'+esc(d.type)+'</span><span class="dl-pct" style="color:'+c+'">'+p+'%</span></div>';
+    }).join('');
+    _donutSource = '선별실적 자동';
+  } else {
+    _donutItems = DB.defectDist.map(d =>
+      '<div class="dl-item"><div class="dl-dot" style="background:'+d.color+'"></div><span>'+esc(d.label)+'</span><span class="dl-pct" style="color:'+d.color+'">'+d.pct+'%</span><button class="btn-edit" style="margin-left:4px" onclick="editDefectDist('+d.id+')">✏</button><button class="btn-del" onclick="delRow(\'defectDist\','+d.id+')">🗑</button></div>'
+    ).join('');
+    _donutAddBtn = '<button class="btn-add" style="padding:4px 10px;font-size:.72rem;" onclick="addDefectDist()">＋</button>';
+    _donutSource = '수동 입력';
+  }
 
   document.getElementById('tab-dashboard').innerHTML = `
     <div class="page-hdr">
@@ -1080,49 +1623,34 @@ function renderDashboard() {
       <div class="mbi"><span class="ml">참석자</span><span class="mv">${esc(m.attendees)}</span></div>
     </div>
     ${autoKpiHtml(calcDashboardKpi())}
+    ${buildTabSummaryHtml()}
     <div class="g2">
       <div class="card">
         <div class="card-hdr">
-          <span class="card-title">📈 주간 불량률 추이</span>
-          <div style="display:flex;gap:8px;align-items:center">
-            <span class="cb">최근 8주</span>
-            <button class="btn-edit" onclick="editTrendData()" title="데이터 편집">✏</button>
-          </div>
+          <span class="card-title">📊 주간 불량 현황</span>
+          <span class="cb" id="weeklyChartRange">세션 데이터 자동 집계</span>
         </div>
-        <div class="chart-wrap"><canvas id="chartTrend"></canvas></div>
+        <div class="chart-wrap"><canvas id="chartWeeklyDefect"></canvas></div>
       </div>
       <div class="card">
         <div class="card-hdr">
-          <span class="card-title">🍩 불량 유형 분포</span>
-          <div style="display:flex;gap:8px;align-items:center">
-            <span class="cb">이번주</span>
-            <button class="btn-add" style="padding:4px 10px;font-size:.72rem;" onclick="addDefectDist()">＋</button>
-          </div>
+          <span class="card-title">📅 월간 불량 현황</span>
+          <span class="cb" id="monthlyChartRange">세션 데이터 자동 집계</span>
         </div>
-        <div style="height:240px;display:flex;align-items:center;gap:16px">
-          <div style="flex:0 0 160px;height:100%"><canvas id="chartDonut"></canvas></div>
-          <div class="dl" style="flex:1">${DB.defectDist.map(d=>`
-            <div class="dl-item">
-              <div class="dl-dot" style="background:${d.color}"></div>
-              <span>${esc(d.label)}</span>
-              <span class="dl-pct" style="color:${d.color}">${d.pct}%</span>
-              <button class="btn-edit" style="margin-left:4px" onclick="editDefectDist(${d.id})">✏</button>
-              <button class="btn-del" onclick="delRow('defectDist',${d.id})">🗑</button>
-            </div>`).join('')}
-          </div>
-        </div>
+        <div class="chart-wrap"><canvas id="chartMonthlyDefect"></canvas></div>
       </div>
     </div>
-    <div class="card">
+    <div class="card" style="margin-top:16px">
       <div class="card-hdr">
-        <span class="card-title">🏗️ 업체별 품질 현황</span>
-        ${addRowBtn('업체 추가','addLine()')}
+        <span class="card-title">🍩 불량 유형 분포</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="cb">${_donutSource}</span>
+          ${_donutAddBtn}
+        </div>
       </div>
-      <div style="overflow-x:auto">
-      <table class="tbl">
-        <thead><tr><th>업체명</th><th>생산품목</th><th>생산수량</th><th>불량수량</th><th>재작업</th><th>폐기</th><th>불량률</th><th>목표</th><th>수율</th><th>상태</th><th>편집</th></tr></thead>
-        <tbody>${linesHtml}</tbody>
-      </table>
+      <div style="height:240px;display:flex;align-items:center;gap:16px">
+        <div style="flex:0 0 160px;height:100%"><canvas id="chartDonut"></canvas></div>
+        <div class="dl" style="flex:1">${_donutItems}</div>
       </div>
     </div>`;
 }
@@ -1175,43 +1703,330 @@ function addDefectDist() {
 }
 
 // ═══════════════════════════════════════════════
-// RENDER — DEFECTS
+// RENDER — DEFECTS  (선별실적 관리 파일 기반)
 // ═══════════════════════════════════════════════
-function renderDefects() {
-  const maxCount = Math.max(...DB.defects.map(d=>d.count), 1);
-  const rows = DB.defects.map((d,i) => `<tr>
-    <td><span style="font-weight:700;color:${i===0?'#fbbf24':i===1?'#94a3b8':i===2?'#b45309':'var(--text-muted)'}">${'①②③④⑤⑥⑦⑧⑨⑩'[i]||i+1}</span></td>
-    <td>${esc(d.type)}</td>
-    <td>${d.count}개</td>
-    <td><div style="display:flex;align-items:center;gap:7px"><div class="prg-wrap"><div class="prg-bar" style="width:${(d.count/maxCount*100).toFixed(0)}%;background:${prgColor(100-d.count/maxCount*80)}"></div></div>${d.pct}%</div></td>
-    <td>${trendArrow(d.trend)}</td>
-    <td>${esc(d.line)}</td>
-    <td style="font-size:.75rem;color:var(--text-muted)">${esc(d.partInfo||'')}</td>
-    <td>${actCell(`editDefect(${d.id})`,`delRow('defects',${d.id})`)}</td>
-  </tr>`).join('');
+const SORT_DEFECT_COLS = ['미성형','코어파손','코어오조립','방수불량','크랙파손','변형','치수불량','힌지크랙','전진검사','이중성형','게이트막힘','혼입','휘어짐','핀자국','가스자국','후레쉬','웰드라인','번트','변색','이물박힘','이물','게이트뜯김','버블','스크래치','씽크','실버','실바리(수지)','찍힘','기타'];
+let sortData = null;
+try { const _ss = localStorage.getItem('qm_sort_data'); if (_ss) sortData = JSON.parse(_ss); } catch(e) {}
 
-  document.getElementById('tab-defect').innerHTML = `
-    <div class="page-hdr"><h2>불량 상세 현황</h2></div>
-    ${autoKpiHtml(calcDefectKpi())}
+function buildWorkplaceWorkerHtml(analysis) {
+  const PAL = ['#ef4444','#f59e0b','#22c55e','#2563eb','#a855f7','#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6'];
+  let html = '';
+
+  // 작업장별 현황
+  if (analysis.workplaces && analysis.workplaces.length > 0) {
+    const maxWPQty = analysis.workplaces[0].defectQty || 1;
+    const wpRows = analysis.workplaces.map((w, i) => {
+      const ppm = w.inspQty > 0 ? Math.round(w.defectQty / w.inspQty * 1000000).toLocaleString() : '—';
+      const pct = analysis.totalDefectQty > 0 ? (w.defectQty / analysis.totalDefectQty * 100).toFixed(1) : '0.0';
+      const barPct = (w.defectQty / maxWPQty * 100).toFixed(0);
+      const c = PAL[i % PAL.length];
+      return `<tr>
+        <td style="text-align:center;color:var(--text-dim)">${i+1}</td>
+        <td><strong style="color:${c}">${esc(w.name)}</strong></td>
+        <td style="text-align:right">${w.inspQty.toLocaleString()}개</td>
+        <td style="text-align:right;font-weight:700;color:#ef4444">${w.defectQty.toLocaleString()}개</td>
+        <td style="text-align:right;color:var(--text-muted)">${ppm}</td>
+        <td style="text-align:right;color:var(--text-dim)">${pct}%</td>
+        <td style="text-align:right">${w.defectAmt > 0 ? fmtWon(w.defectAmt) : '<span style="color:var(--text-dim)">—</span>'}</td>
+        <td><div style="display:flex;align-items:center;gap:6px"><div class="prg-wrap" style="flex:1;min-width:60px"><div class="prg-bar" style="width:${barPct}%;background:${c}"></div></div></div></td>
+      </tr>`;
+    }).join('');
+    html += `
+    <div class="card" style="margin-top:14px">
+      <div class="card-hdr">
+        <span class="card-title">🏭 작업장별 불량 현황</span>
+        <span class="cb">${analysis.workplaces.length}개 작업장</span>
+      </div>
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr>
+          <th style="text-align:center">#</th>
+          <th>작업장명</th>
+          <th style="text-align:right">검사수량</th>
+          <th style="text-align:right">불량수량</th>
+          <th style="text-align:right">PPM</th>
+          <th style="text-align:right">비율</th>
+          <th style="text-align:right">불량금액</th>
+          <th>수량 바</th>
+        </tr></thead>
+        <tbody>${wpRows}</tbody>
+        ${analysis.workplaces.length > 1 ? `
+        <tfoot><tr style="border-top:2px solid var(--border)">
+          <td colspan="2" style="font-weight:700;padding:10px 12px">합계</td>
+          <td style="text-align:right;font-weight:700">${analysis.totalInspQty.toLocaleString()}개</td>
+          <td style="text-align:right;font-weight:700;color:#ef4444">${analysis.totalDefectQty.toLocaleString()}개</td>
+          <td style="text-align:right">${analysis.avgPpm.toLocaleString()}</td>
+          <td style="text-align:right;color:var(--text-dim)">100%</td>
+          <td style="text-align:right">${analysis.totalDefectAmt > 0 ? fmtWon(analysis.totalDefectAmt) : '—'}</td>
+          <td></td>
+        </tr></tfoot>` : ''}
+      </table>
+      </div>
+    </div>`;
+  }
+
+  // 작업자별 현황
+  if (analysis.workers && analysis.workers.length > 0) {
+    const maxWkQty = analysis.workers[0].defectQty || 1;
+    const wkRows = analysis.workers.map((w, i) => {
+      const ppm = w.inspQty > 0 ? Math.round(w.defectQty / w.inspQty * 1000000).toLocaleString() : '—';
+      const pct = analysis.totalDefectQty > 0 ? (w.defectQty / analysis.totalDefectQty * 100).toFixed(1) : '0.0';
+      const barPct = (w.defectQty / maxWkQty * 100).toFixed(0);
+      const c = PAL[i % PAL.length];
+      return `<tr>
+        <td style="text-align:center;color:var(--text-dim)">${i+1}</td>
+        <td><strong style="color:${c}">${esc(w.name)}</strong></td>
+        <td style="text-align:right">${w.inspQty.toLocaleString()}개</td>
+        <td style="text-align:right;font-weight:700;color:#ef4444">${w.defectQty.toLocaleString()}개</td>
+        <td style="text-align:right;color:var(--text-muted)">${ppm}</td>
+        <td style="text-align:right;color:var(--text-dim)">${pct}%</td>
+        <td style="text-align:right">${w.defectAmt > 0 ? fmtWon(w.defectAmt) : '<span style="color:var(--text-dim)">—</span>'}</td>
+        <td><div style="display:flex;align-items:center;gap:6px"><div class="prg-wrap" style="flex:1;min-width:60px"><div class="prg-bar" style="width:${barPct}%;background:${c}"></div></div></div></td>
+      </tr>`;
+    }).join('');
+    html += `
+    <div class="card" style="margin-top:14px">
+      <div class="card-hdr">
+        <span class="card-title">🛠️ 작업자별 불량 현황</span>
+        <span class="cb">${analysis.workers.length}명</span>
+      </div>
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr>
+          <th style="text-align:center">#</th>
+          <th>작업자</th>
+          <th style="text-align:right">검사수량</th>
+          <th style="text-align:right">불량수량</th>
+          <th style="text-align:right">PPM</th>
+          <th style="text-align:right">비율</th>
+          <th style="text-align:right">불량금액</th>
+          <th>수량 바</th>
+        </tr></thead>
+        <tbody>${wkRows}</tbody>
+        ${analysis.workers.length > 1 ? `
+        <tfoot><tr style="border-top:2px solid var(--border)">
+          <td colspan="2" style="font-weight:700;padding:10px 12px">합계</td>
+          <td style="text-align:right;font-weight:700">${analysis.totalInspQty.toLocaleString()}개</td>
+          <td style="text-align:right;font-weight:700;color:#ef4444">${analysis.totalDefectQty.toLocaleString()}개</td>
+          <td style="text-align:right">${analysis.avgPpm.toLocaleString()}</td>
+          <td style="text-align:right;color:var(--text-dim)">100%</td>
+          <td style="text-align:right">${analysis.totalDefectAmt > 0 ? fmtWon(analysis.totalDefectAmt) : '—'}</td>
+          <td></td>
+        </tr></tfoot>` : ''}
+      </table>
+      </div>
+    </div>`;
+  }
+
+  // 작업장/작업자 모두 없으면 열 매핑 안내 카드 표시
+  if (!html) {
+    html = `
+    <div class="card" style="margin-top:14px;text-align:center;padding:32px 24px">
+      <div style="font-size:2rem;margin-bottom:10px">🏭</div>
+      <div style="font-weight:700;margin-bottom:6px">작업장 · 작업자 데이터 없음</div>
+      <div style="font-size:.83rem;color:var(--text-muted);margin-bottom:16px">엑셀에 <strong>작업장명</strong> 또는 <strong>작업자명</strong> 열이 있으면<br>열 매핑에서 연결하면 자동으로 표시됩니다.</div>
+      <button class="btn-sec" onclick="openSortColMapModal()" style="font-size:.82rem">= 열 매핑 설정</button>
+    </div>`;
+  }
+
+  return html;
+}
+
+function renderDefects() {
+  const el = document.getElementById('tab-defect');
+  if (!el) return;
+
+  const uploadZone = `
+    <div class="card" style="text-align:center;padding:40px 24px;margin-bottom:16px">
+      <div style="font-size:3rem;margin-bottom:12px">📋</div>
+      <h3 style="margin-bottom:8px;font-size:1.1rem">선별실적 관리 파일 업로드</h3>
+      <p style="color:var(--text-muted);font-size:.85rem;margin-bottom:20px;line-height:1.6">
+        선별실적 관리 <strong>.xlsx / .xls / .csv</strong> 파일을 업로드하면<br>
+        불량 유형별·품목별 상세 분석을 자동으로 표시합니다.
+      </p>
+      <div class="fc-drop-zone" onclick="document.getElementById('sortFileInput').click()"
+           ondragover="event.preventDefault();this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="event.preventDefault();this.classList.remove('drag-over');handleSortExcelDrop(event)">
+        <div style="font-size:2.5rem">📂</div>
+        <p style="font-weight:700;margin-top:8px">클릭하거나 파일을 드롭하세요</p>
+        <p style="font-size:.75rem;color:var(--text-dim);margin-top:4px">.xlsx · .xls · .csv</p>
+      </div>
+      <input type="file" id="sortFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleSortExcelUpload(event)">
+    </div>`;
+
+  if (!sortData || !sortData.rows || !sortData.rows.length) {
+    const maxCount = Math.max(...(DB.defects||[]).map(d=>d.count), 1);
+    const rows = (DB.defects||[]).map((d,i) => `<tr>
+      <td><span style="font-weight:700;color:${i===0?'#fbbf24':i===1?'#94a3b8':i===2?'#b45309':'var(--text-muted)'}">${'①②③④⑤⑥⑦⑧⑨⑩'[i]||i+1}</span></td>
+      <td>${esc(d.type)}</td>
+      <td>${d.count}개</td>
+      <td><div style="display:flex;align-items:center;gap:7px"><div class="prg-wrap"><div class="prg-bar" style="width:${(d.count/maxCount*100).toFixed(0)}%;background:${prgColor(100-d.count/maxCount*80)}"></div></div>${d.pct}%</div></td>
+      <td>${trendArrow(d.trend)}</td>
+      <td>${esc(d.line)}</td>
+      <td style="font-size:.75rem;color:var(--text-muted)">${esc(d.partInfo||'')}</td>
+      <td>${actCell(`editDefect(${d.id})`,`delRow('defects',${d.id})`)}</td>
+    </tr>`).join('');
+    el.innerHTML = `
+      <div class="page-hdr"><h2>불량 상세 현황</h2></div>
+      ${uploadZone}
+      ${autoKpiHtml(calcDefectKpi())}
+      <div class="g2">
+        <div class="card">
+          <div class="card-hdr">
+            <span class="card-title">📋 주요 불량 유형 순위</span>
+            ${addRowBtn('불량 추가','addDefect()')}
+          </div>
+          <div style="overflow-x:auto">
+          <table class="tbl">
+            <thead><tr><th>#</th><th>불량 유형</th><th>발생수</th><th>비율</th><th>추이</th><th>업체명</th><th>품번/품명</th><th>편집</th></tr></thead>
+            <tbody>${rows||`<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-dim)">위 파일을 업로드하거나 불량 항목을 추가하세요.</td></tr>`}</tbody>
+          </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><span class="card-title">📊 업체별 불량 비교</span><span class="cb">이번주 vs 전주</span></div>
+          <div class="chart-wrap"><canvas id="chartByLine"></canvas></div>
+        </div>
+      </div>
+      ${renderFailureCostSection()}`;
+    return;
+  }
+
+  // ── 파일 데이터 분석 뷰 ──
+  const analysis = buildSortAnalysis(sortData);
+  const PAL = ['#ef4444','#f59e0b','#22c55e','#2563eb','#a855f7','#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6'];
+  const maxDef = analysis.defectTypeList[0]?.count || 1;
+
+  const defectTypeRows = analysis.defectTypeList.map((d,i) => {
+    const pct = analysis.totalDefectQty > 0 ? (d.count / analysis.totalDefectQty * 100).toFixed(1) : '0.0';
+    const barPct = (d.count / maxDef * 100).toFixed(0);
+    const color = PAL[i % PAL.length];
+    return `<tr>
+      <td style="text-align:center;font-weight:700;color:${i<3?color:'var(--text-dim)'}">${i+1}</td>
+      <td><strong>${esc(d.type)}</strong></td>
+      <td style="text-align:right;font-weight:700">${d.count.toLocaleString()}개</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="prg-wrap" style="flex:1;min-width:60px">
+            <div class="prg-bar" style="width:${barPct}%;background:${color}"></div>
+          </div>
+          <span style="color:var(--text-dim);white-space:nowrap;min-width:36px;text-align:right">${pct}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const partRows = analysis.parts.map((p,i) => {
+    const ppm = p.inspQty > 0 ? Math.round(p.defectQty / p.inspQty * 1000000).toLocaleString() : '—';
+    const pct = analysis.totalDefectQty > 0 ? (p.defectQty / analysis.totalDefectQty * 100).toFixed(1) : '0.0';
+    return `<tr>
+      <td style="text-align:center;color:var(--text-dim)">${i+1}</td>
+      <td><strong style="font-family:monospace;color:var(--accent-cyan)">${esc(p.partNo)}</strong></td>
+      <td>${esc(p.partName)}</td>
+      <td style="text-align:right">${p.inspQty.toLocaleString()}개</td>
+      <td style="text-align:right;font-weight:700;color:#ef4444">${p.defectQty.toLocaleString()}개</td>
+      <td style="text-align:right;color:var(--text-muted)">${ppm}</td>
+      <td style="text-align:right">${p.defectAmt > 0 ? fmtWon(p.defectAmt) : '—'}</td>
+      <td style="text-align:right;color:var(--text-dim)">${pct}%</td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="page-hdr">
+      <h2>불량 상세 현황</h2>
+      <div class="hdr-actions">
+        <button class="btn-sec" onclick="document.getElementById('sortFileInput2').click()">📂 다른 파일</button>
+        <input type="file" id="sortFileInput2" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleSortExcelUpload(event)">
+        <button class="btn-edit btn-edit-text" onclick="openSortColMapModal()" style="font-size:.82rem">✏ 열 매핑</button>
+      </div>
+    </div>
+    <div class="g4 sp">
+      <div class="kpi" style="--kc:#2563eb">
+        <div class="kpi-icon">🔍</div><div class="kpi-lbl">총 검사수량</div>
+        <div class="kpi-val">${analysis.totalInspQty.toLocaleString()}개</div>
+        <div class="kpi-sub">${analysis.rowCount.toLocaleString()}행 · ${esc(sortData.fileName||'—')}</div>
+      </div>
+      <div class="kpi" style="--kc:#ef4444">
+        <div class="kpi-icon">⚠️</div><div class="kpi-lbl">총 불량수량</div>
+        <div class="kpi-val">${analysis.totalDefectQty.toLocaleString()}개</div>
+        <div class="kpi-sub">${analysis.defectTypeList.length}개 불량 유형 검출</div>
+      </div>
+      <div class="kpi" style="--kc:#f59e0b">
+        <div class="kpi-icon">📉</div><div class="kpi-lbl">불량율(PPM)</div>
+        <div class="kpi-val">${analysis.avgPpm.toLocaleString()}</div>
+        <div class="kpi-sub">평균 · 검사수량 기준</div>
+      </div>
+      <div class="kpi" style="--kc:#a855f7">
+        <div class="kpi-icon">💸</div><div class="kpi-lbl">불량 금액</div>
+        <div class="kpi-val" style="font-size:${analysis.totalDefectAmt>0?'1rem':'1.3rem'}">${analysis.totalDefectAmt > 0 ? fmtWon(analysis.totalDefectAmt) : '—'}</div>
+        <div class="kpi-sub"><button class="btn-edit btn-edit-text" onclick="openSortColMapModal()" style="font-size:.72rem">✏ 열 매핑 변경</button></div>
+      </div>
+    </div>
     <div class="g2">
       <div class="card">
         <div class="card-hdr">
-          <span class="card-title">📋 주요 불량 유형 순위</span>
-          ${addRowBtn('불량 추가','addDefect()')}
+          <span class="card-title">🏷 불량 유형별 순위</span>
+          <span class="cb">${analysis.defectTypeList.length}개 유형</span>
         </div>
-        <div style="overflow-x:auto">
+        <div style="overflow-x:auto;max-height:440px;overflow-y:auto">
         <table class="tbl">
-          <thead><tr><th>#</th><th>불량 유형</th><th>발생수</th><th>비율</th><th>추이</th><th>업체명</th><th>품번/품명</th><th>편집</th></tr></thead>
-          <tbody>${rows}</tbody>
+          <thead><tr>
+            <th style="text-align:center">#</th>
+            <th>불량 유형</th>
+            <th style="text-align:right">수량</th>
+            <th>비율</th>
+          </tr></thead>
+          <tbody>${defectTypeRows||`<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text-dim)">열 매핑에서 불량 유형 열을 확인하세요.</td></tr>`}</tbody>
+          ${analysis.defectTypeList.length > 0 ? `
+          <tfoot><tr style="border-top:2px solid var(--border)">
+            <td colspan="2" style="font-weight:700;padding:10px 12px">합계</td>
+            <td style="text-align:right;font-weight:700;color:#ef4444">${analysis.totalDefectQty.toLocaleString()}개</td>
+            <td style="color:var(--text-dim)">100%</td>
+          </tr></tfoot>` : ''}
         </table>
         </div>
       </div>
       <div class="card">
-        <div class="card-hdr"><span class="card-title">📊 업체별 불량 비교</span><span class="cb">이번주 vs 전주</span></div>
-        <div class="chart-wrap"><canvas id="chartByLine"></canvas></div>
+        <div class="card-hdr"><span class="card-title">📊 불량 유형별 차트</span></div>
+        <div class="chart-wrap" style="height:${Math.max(240, analysis.defectTypeList.length * 34)}px">
+          <canvas id="chartSortBar"></canvas>
+        </div>
       </div>
     </div>
-    ${renderFailureCostSection()}`;
+    <div class="card">
+      <div class="card-hdr">
+        <span class="card-title">📦 품목별 불량 현황</span>
+        <span class="cb">${analysis.parts.length}개 품목</span>
+      </div>
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr>
+          <th style="text-align:center">#</th>
+          <th>품목(품번)</th>
+          <th>품목명</th>
+          <th style="text-align:right">검사수량</th>
+          <th style="text-align:right">불량수량</th>
+          <th style="text-align:right">PPM</th>
+          <th style="text-align:right">불량금액</th>
+          <th style="text-align:right">비율</th>
+        </tr></thead>
+        <tbody>${partRows||`<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-dim)">열 매핑이 올바른지 확인하세요.</td></tr>`}</tbody>
+        ${analysis.parts.length > 1 ? `
+        <tfoot><tr style="border-top:2px solid var(--border)">
+          <td colspan="3" style="font-weight:700;padding:10px 12px">합계</td>
+          <td style="text-align:right;font-weight:700">${analysis.totalInspQty.toLocaleString()}개</td>
+          <td style="text-align:right;font-weight:700;color:#ef4444">${analysis.totalDefectQty.toLocaleString()}개</td>
+          <td style="text-align:right">${analysis.avgPpm.toLocaleString()}</td>
+          <td style="text-align:right">${analysis.totalDefectAmt > 0 ? fmtWon(analysis.totalDefectAmt) : '—'}</td>
+          <td style="text-align:right;color:var(--text-dim)">100%</td>
+        </tr></tfoot>` : ''}
+      </table>
+      </div>
+    </div>
+    ${buildWorkplaceWorkerHtml(analysis)}`;
+  setTimeout(() => initSortCharts(analysis), 60);
 }
 
 function renderFailureCostSection() {
@@ -1226,15 +2041,18 @@ function renderFailureCostSection() {
   const rows = costs.map((c,i) => {
     const barPct = maxCost > 0 ? (c.total / maxCost * 100).toFixed(0) : 0;
     const barColor = i===0 ? '#ef4444' : i===1 ? '#f59e0b' : i===2 ? '#f97316' : '#2563eb';
+    const masterTag = c.fromMaster
+      ? `<span style="font-size:.6rem;background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.3);border-radius:4px;padding:1px 5px;vertical-align:middle;margin-left:4px">단가마스터</span>`
+      : (c.reworkUnit||c.scrapUnit ? `<span style="font-size:.6rem;color:var(--text-dim);margin-left:4px">수동</span>` : '');
     return `<tr>
       <td style="font-size:1.2rem;text-align:center">${rankEmoji[i]||`<span style="color:var(--text-dim)">${i+1}</span>`}</td>
-      <td><strong style="color:${rankColors[i]||'var(--text-primary)'}">${esc(c.name)}</strong><br>
+      <td><strong style="color:${rankColors[i]||'var(--text-primary)'}">${esc(c.name)}</strong>${masterTag}<br>
           <small style="color:var(--text-dim)">${esc(c.product)}</small></td>
       <td style="text-align:right">
-        ${c.reworkCost>0?`<span style="color:#fbbf24">${fmtWon(c.reworkCost)}</span>`:'<span style="color:var(--text-dim)">—</span>'}
+        ${c.reworkCost>0?`<span style="color:#fbbf24">${fmtWon(c.reworkCost)}</span><br><small style="color:var(--text-dim)">@${c.reworkUnit.toLocaleString()}원</small>`:'<span style="color:var(--text-dim)">—</span>'}
       </td>
       <td style="text-align:right">
-        ${c.scrapCost>0?`<span style="color:#f87171">${fmtWon(c.scrapCost)}</span>`:'<span style="color:var(--text-dim)">—</span>'}
+        ${c.scrapCost>0?`<span style="color:#f87171">${fmtWon(c.scrapCost)}</span><br><small style="color:var(--text-dim)">@${c.scrapUnit.toLocaleString()}원</small>`:'<span style="color:var(--text-dim)">—</span>'}
       </td>
       <td style="text-align:right">
         ${c.extra>0?`<span style="color:#c084fc">${fmtWon(c.extra)}</span>`:'<span style="color:var(--text-dim)">—</span>'}
@@ -1251,7 +2069,7 @@ function renderFailureCostSection() {
   }).join('');
 
   const noDataMsg = `<tr><td colspan="6" style="text-align:center;padding:28px;color:var(--text-dim)">
-    업체별 현황에서 재작업/폐기 수량과 개당 비용을 입력하면 자동 계산됩니다.
+    품번/품명 탭에서 단가 마스터를 등록하고 재작업·폐기 수량을 입력하면 자동 계산됩니다.
   </td></tr>`;
 
   return `
@@ -1316,6 +2134,215 @@ function addDefect() {
     result.id = ++nextId;
     DB.defects.push(result);
     saveData(); refresh();
+  });
+}
+
+// ── 선별실적 파일 처리 ──
+function handleSortExcelUpload(event) {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  processSortFile(file);
+}
+function handleSortExcelDrop(event) {
+  const file = event.dataTransfer.files[0];
+  if (!file) return;
+  processSortFile(file);
+}
+function processSortFile(file) {
+  if (typeof XLSX === 'undefined') { alert('라이브러리 로딩 중입니다. 잠시 후 다시 시도해주세요.'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(new Uint8Array(e.target.result), { type:'array', cellDates:false });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, { header:1, defval:'' });
+      if (!raw || raw.length < 2) { alert('데이터가 없거나 형식이 맞지 않습니다.'); return; }
+      const headers = raw[0].map((h,i) => h ? String(h).trim() : `열${i+1}`);
+      const rows = raw.slice(1).filter(r => r.some(c => c !== '')).map(r => {
+        const obj = {};
+        headers.forEach((h,i) => { obj[h] = r[i] ?? ''; });
+        return obj;
+      });
+      const colMap = detectSortColumns(headers);
+      sortData = { headers, rows, colMap, fileName: file.name };
+      try { localStorage.setItem('qm_sort_data', JSON.stringify(sortData)); } catch(ee) {}
+      const _wid = _currentSessionId || getWeekId(DB);
+      if (_wid) try { localStorage.setItem('qm_sess_sort_'+_wid, JSON.stringify(sortData)); } catch(ee) {}
+      renderDefects();
+      setTimeout(initCollapsible, 80);
+    } catch(err) { alert('파일 처리 중 오류가 발생했습니다:\n' + err.message); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ── 열 자동 감지 ──
+function detectSortColumns(headers) {
+  const norm = h => h.toLowerCase().replace(/[\s\-_\/\(\)\'\"]/g,'');
+  const find = (...pats) => {
+    for (const p of pats) {
+      const idx = headers.findIndex(h => norm(h).includes(p));
+      if (idx >= 0) return headers[idx];
+    }
+    return '';
+  };
+  const defectTypes = {};
+  SORT_DEFECT_COLS.forEach(col => {
+    const match = headers.find(h => h.trim() === col);
+    if (match) defectTypes[col] = match;
+  });
+  return {
+    date:      find('선별일','날짜','일자','date'),
+    workplace: find('작업장명','작업장','공정명','공정','부서명','부서','담당부서','사업장','라인명','라인','line','process','section'),
+    worker:    find('작업자명','작업자','검사원','작업원','사원명','사원','담당자','검사자','작업담당','inspector','operator','worker'),
+    partNo:    find('품목','품번','partno','자재번호'),
+    partName:  find('품목명','품명','partname'),
+    inspQty:   find('검사수량'),
+    defectQty: find('불량수량'),
+    defectAmt: find('불량금액'),
+    defectPpm: find('불량율','ppm'),
+    defectTypes,
+  };
+}
+
+// ── 분석 로직 ──
+function buildSortAnalysis(data) {
+  const { rows, headers } = data;
+  // 기존 colMap에서 누락된 열은 headers로 재감지
+  const colMap = Object.assign({}, data.colMap);
+  if (headers && headers.length > 0) {
+    const detected = detectSortColumns(headers);
+    if (!colMap.workplace && detected.workplace) colMap.workplace = detected.workplace;
+    if (!colMap.worker   && detected.worker)    colMap.worker    = detected.worker;
+  }
+  let totalInspQty = 0, totalDefectQty = 0, totalDefectAmt = 0;
+  const defectTypeTotals = {};
+  SORT_DEFECT_COLS.forEach(t => { defectTypeTotals[t] = 0; });
+  const partMap = {};
+  const workplaceMap = {};
+  const workerMap = {};
+
+  rows.forEach(row => {
+    const inspQty   = parseMoney(row[colMap.inspQty])   || 0;
+    const defectQty = parseMoney(row[colMap.defectQty]) || 0;
+    const defectAmt = parseMoney(row[colMap.defectAmt]) || 0;
+    const partNo    = String(row[colMap.partNo]   || '').trim() || '미상';
+    const partName  = String(row[colMap.partName] || '').trim();
+
+    totalInspQty   += inspQty;
+    totalDefectQty += defectQty;
+    totalDefectAmt += defectAmt;
+
+    SORT_DEFECT_COLS.forEach(t => {
+      const col = colMap.defectTypes?.[t];
+      if (col) defectTypeTotals[t] += (parseMoney(row[col]) || 0);
+    });
+
+    if (!partMap[partNo]) partMap[partNo] = { partNo, partName, inspQty:0, defectQty:0, defectAmt:0 };
+    partMap[partNo].inspQty   += inspQty;
+    partMap[partNo].defectQty += defectQty;
+    partMap[partNo].defectAmt += defectAmt;
+
+    const workplace = String(row[colMap.workplace] || '').trim();
+    const worker    = String(row[colMap.worker]    || '').trim();
+    if (workplace) {
+      if (!workplaceMap[workplace]) workplaceMap[workplace] = { name: workplace, inspQty:0, defectQty:0, defectAmt:0 };
+      workplaceMap[workplace].inspQty   += inspQty;
+      workplaceMap[workplace].defectQty += defectQty;
+      workplaceMap[workplace].defectAmt += defectAmt;
+    }
+    if (worker) {
+      if (!workerMap[worker]) workerMap[worker] = { name: worker, inspQty:0, defectQty:0, defectAmt:0 };
+      workerMap[worker].inspQty   += inspQty;
+      workerMap[worker].defectQty += defectQty;
+      workerMap[worker].defectAmt += defectAmt;
+    }
+  });
+
+  const avgPpm = totalInspQty > 0 ? Math.round(totalDefectQty / totalInspQty * 1000000) : 0;
+  const defectTypeList = SORT_DEFECT_COLS
+    .map(t => ({ type: t, count: defectTypeTotals[t] }))
+    .filter(d => d.count > 0)
+    .sort((a,b) => b.count - a.count);
+  const parts = Object.values(partMap).sort((a,b) => b.defectQty - a.defectQty);
+  const workplaces = Object.values(workplaceMap).sort((a,b) => b.defectQty - a.defectQty);
+  const workers    = Object.values(workerMap).sort((a,b) => b.defectQty - a.defectQty);
+
+  return { totalInspQty, totalDefectQty, totalDefectAmt, avgPpm, defectTypeList, parts, workplaces, workers, rowCount: rows.length };
+}
+
+// ── 차트 ──
+function initSortCharts(analysis) {
+  const isLight = document.body.classList.contains('light');
+  const gc = isLight ? '#e2e8f0' : '#1e2d4a';
+  const tc = isLight ? '#475569' : '#94a3b8';
+  const PAL = ['#ef4444','#f59e0b','#22c55e','#2563eb','#a855f7','#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6'];
+  const el = document.getElementById('chartSortBar');
+  if (!el) return;
+  const c = Chart.getChart('chartSortBar'); if (c) c.destroy();
+  const labels = analysis.defectTypeList.map(d => d.type);
+  const counts = analysis.defectTypeList.map(d => d.count);
+  const colors = analysis.defectTypeList.map((_,i) => PAL[i % PAL.length]);
+  new Chart('chartSortBar', {
+    type: 'bar',
+    data: { labels, datasets: [{ label: '불량수량', data: counts, backgroundColor: colors.map(c=>c+'cc'), borderRadius: 4 }] },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw.toLocaleString()}개` } } },
+      scales: {
+        x: { grid: { color: gc }, ticks: { color: tc } },
+        y: { grid: { display: false }, ticks: { color: tc } }
+      }
+    }
+  });
+}
+
+// ── 열 매핑 모달 ──
+function openSortColMapModal() {
+  if (!sortData) return;
+  const noneOpt = '(없음)';
+  const opts = [noneOpt, ...sortData.headers];
+  const schema = [
+    {k:'date',      l:'선별일 열',          t:'select', opts},
+    {k:'workplace', l:'작업장명 열',         t:'select', opts},
+    {k:'worker',    l:'작업자 열',           t:'select', opts},
+    {k:'partNo',    l:'품목(품번) 열',       t:'select', opts},
+    {k:'partName',  l:'품목명 열',           t:'select', opts},
+    {k:'inspQty',   l:'검사수량 열',         t:'select', opts},
+    {k:'defectQty', l:'불량수량 열',         t:'select', opts},
+    {k:'defectAmt', l:'불량금액 열',         t:'select', opts},
+    {k:'defectPpm', l:'불량율(PPM) 열',      t:'select', opts},
+  ];
+  // 불량 유형 열 매핑 추가 (감지된 것만)
+  const detectedTypes = SORT_DEFECT_COLS.filter(t => sortData.colMap.defectTypes?.[t]);
+  const missingTypes  = SORT_DEFECT_COLS.filter(t => !sortData.colMap.defectTypes?.[t]);
+  if (missingTypes.length > 0) {
+    missingTypes.forEach(t => schema.push({k:'_dt_'+t, l:`불량유형: ${t}`, t:'select', opts}));
+  }
+  const cur = {};
+  Object.entries(sortData.colMap).forEach(([k,v]) => {
+    if (k !== 'defectTypes') cur[k] = v || noneOpt;
+  });
+  (sortData.colMap.defectTypes||{});
+  SORT_DEFECT_COLS.forEach(t => {
+    cur['_dt_'+t] = sortData.colMap.defectTypes?.[t] || noneOpt;
+  });
+
+  openModal('선별실적 열 매핑 설정', schema, cur, result => {
+    Object.entries(result).forEach(([k,v]) => {
+      if (k.startsWith('_dt_')) {
+        const type = k.slice(4);
+        if (!sortData.colMap.defectTypes) sortData.colMap.defectTypes = {};
+        sortData.colMap.defectTypes[type] = v === noneOpt ? '' : v;
+      } else {
+        sortData.colMap[k] = v === noneOpt ? '' : v;
+      }
+    });
+    try { localStorage.setItem('qm_sort_data', JSON.stringify(sortData)); } catch(ee) {}
+    const _wid = _currentSessionId || getWeekId(DB);
+    if (_wid) try { localStorage.setItem('qm_sess_sort_'+_wid, JSON.stringify(sortData)); } catch(ee) {}
+    renderDefects();
+    setTimeout(initCollapsible, 80);
   });
 }
 
@@ -1662,30 +2689,89 @@ function initCharts() {
 
   const destroy = id => { const c = Chart.getChart(id); if (c) c.destroy(); };
 
-  // Trend chart
-  if (document.getElementById('chartTrend')) {
-    destroy('chartTrend');
-    const td = DB.trendData;
-    new Chart('chartTrend', {
-      type:'line',
+  // 주간 불량 현황 (자동 집계)
+  if (document.getElementById('chartWeeklyDefect')) {
+    destroy('chartWeeklyDefect');
+    const wt = calcWeeklyTrendData();
+    const wEmpty = !wt.labels.length;
+    const wRange = document.getElementById('weeklyChartRange');
+    if (wRange && !wEmpty) wRange.textContent = wt.labels[0] + ' ~ ' + wt.labels[wt.labels.length-1];
+    new Chart('chartWeeklyDefect', {
       data:{
-        labels:td.labels,
+        labels: wEmpty?['데이터 없음']:wt.labels,
         datasets:[
-          {label:'불량률(%)',data:td.values,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.12)',borderWidth:2.5,pointBackgroundColor:'#2563eb',pointRadius:4,pointHoverRadius:6,tension:.4,fill:true},
-          {label:'목표(%)',data:td.labels.map(()=>td.target),borderColor:'#ef4444',borderWidth:1.5,borderDash:[5,5],pointRadius:0,fill:false}
+          {type:'bar',  label:'불량수량', data:wEmpty?[0]:wt.defectQty, backgroundColor:'rgba(239,68,68,.75)', borderRadius:5, yAxisID:'y'},
+          {type:'line', label:'PPM',    data:wEmpty?[0]:wt.ppm, borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,.08)', borderWidth:2.5, pointRadius:4, pointHoverRadius:6, tension:.4, yAxisID:'y2', fill:true}
         ]
       },
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12,padding:12,color:textColor}}},scales:{y:{min:Math.max(0,Math.min(...td.values)-.1),grid:{color:gridColor},ticks:{callback:v=>v.toFixed(2)+'%',color:textColor}},x:{grid:{display:false},ticks:{color:textColor}}}}
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{
+          legend:{position:'top',labels:{boxWidth:10,padding:10,color:textColor}},
+          tooltip:{callbacks:{label:ctx=>ctx.dataset.yAxisID==='y2'?'  PPM: '+ctx.raw.toLocaleString():'  불량: '+ctx.raw.toLocaleString()+'개'}}
+        },
+        scales:{
+          y:{position:'left',grid:{color:gridColor},beginAtZero:true,ticks:{color:textColor},title:{display:true,text:'불량수량(개)',color:textColor,font:{size:10}}},
+          y2:{position:'right',grid:{display:false},beginAtZero:true,ticks:{color:'#f59e0b',callback:v=>v.toLocaleString()},title:{display:true,text:'PPM',color:'#f59e0b',font:{size:10}}},
+          x:{grid:{display:false},ticks:{color:textColor,maxRotation:45}}
+        }
+      }
     });
   }
 
-  // Donut
+  // 월간 불량 현황 (자동 집계)
+  if (document.getElementById('chartMonthlyDefect')) {
+    destroy('chartMonthlyDefect');
+    const mt = calcMonthlyTrendData();
+    const mEmpty = !mt.labels.length;
+    const mRange = document.getElementById('monthlyChartRange');
+    if (mRange && !mEmpty) mRange.textContent = mt.labels[0] + ' ~ ' + mt.labels[mt.labels.length-1];
+    new Chart('chartMonthlyDefect', {
+      data:{
+        labels: mEmpty?['데이터 없음']:mt.labels,
+        datasets:[
+          {type:'bar',  label:'불량수량', data:mEmpty?[0]:mt.defectQty, backgroundColor:'rgba(37,99,235,.75)', borderRadius:5, yAxisID:'y'},
+          {type:'line', label:'PPM',    data:mEmpty?[0]:mt.ppm, borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,.08)', borderWidth:2.5, pointRadius:4, pointHoverRadius:6, tension:.4, yAxisID:'y2', fill:true}
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{
+          legend:{position:'top',labels:{boxWidth:10,padding:10,color:textColor}},
+          tooltip:{callbacks:{label:ctx=>ctx.dataset.yAxisID==='y2'?'  PPM: '+ctx.raw.toLocaleString():'  불량: '+ctx.raw.toLocaleString()+'개'}}
+        },
+        scales:{
+          y:{position:'left',grid:{color:gridColor},beginAtZero:true,ticks:{color:textColor},title:{display:true,text:'불량수량(개)',color:textColor,font:{size:10}}},
+          y2:{position:'right',grid:{display:false},beginAtZero:true,ticks:{color:'#f59e0b',callback:v=>v.toLocaleString()},title:{display:true,text:'PPM',color:'#f59e0b',font:{size:10}}},
+          x:{grid:{display:false},ticks:{color:textColor}}
+        }
+      }
+    });
+  }
+
+  // Donut (선별실적 자동 / 수동 fallback)
   if (document.getElementById('chartDonut')) {
     destroy('chartDonut');
+    const _DPAL2 = ['#ef4444','#f59e0b','#22c55e','#2563eb','#a855f7','#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6'];
+    let _dl, _dd, _dc;
+    if (sortData && sortData.rows && sortData.rows.length) {
+      const _a = buildSortAnalysis(sortData);
+      const _t = _a.defectTypeList.slice(0, 10);
+      const _tot = _a.totalDefectQty || 1;
+      _dl = _t.map(d => d.type);
+      _dd = _t.map(d => parseFloat((d.count / _tot * 100).toFixed(1)));
+      _dc = _t.map((_,i) => _DPAL2[i % _DPAL2.length]);
+    } else {
+      _dl = DB.defectDist.map(d => d.label);
+      _dd = DB.defectDist.map(d => d.pct);
+      _dc = DB.defectDist.map(d => d.color);
+    }
     new Chart('chartDonut', {
       type:'doughnut',
-      data:{labels:DB.defectDist.map(d=>d.label),datasets:[{data:DB.defectDist.map(d=>d.pct),backgroundColor:DB.defectDist.map(d=>d.color),borderWidth:0,hoverOffset:6}]},
-      options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}
+      data:{labels:_dl, datasets:[{data:_dd, backgroundColor:_dc, borderWidth:0, hoverOffset:6}]},
+      options:{responsive:true, maintainAspectRatio:false, cutout:'70%',
+        plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.raw}%`}}}
+      }
     });
   }
 
@@ -1836,11 +2922,642 @@ function showTab(id) {
 }
 
 // ═══════════════════════════════════════════════
+// VENDOR QUALITY ANALYSIS (EXCEL IMPORT)
+// ═══════════════════════════════════════════════
+let vqData = null; // { headers:[], rows:[], colMap:{}, fileName:'' }
+try { const _s = localStorage.getItem('qm_vq_data'); if (_s) vqData = JSON.parse(_s); } catch(e) {}
+
+function renderVendorQuality() {
+  const el = document.getElementById('tab-vendor-quality');
+  if (!el) return;
+
+  if (!vqData || !vqData.rows || !vqData.rows.length) {
+    el.innerHTML = `
+      <div class="page-hdr"><h2>업체별 품질 현황</h2></div>
+      <div class="card" style="text-align:center;padding:48px 24px">
+        <div style="font-size:3.5rem;margin-bottom:16px">🏗️</div>
+        <h3 style="margin-bottom:8px;font-size:1.15rem">엑셀 파일을 업로드하면 업체별로 자동 분석합니다</h3>
+        <p style="color:var(--text-muted);margin-bottom:28px;font-size:.85rem;line-height:1.7">
+          업체명·품번·불량수량·단가가 포함된 <strong>.xlsx / .xls / .csv</strong> 파일을 선택하면<br>
+          업체별·품번별 불량 수령 비용을 자동으로 산출합니다.
+        </p>
+        <div class="fc-drop-zone" onclick="document.getElementById('vqFileInput').click()"
+             ondragover="event.preventDefault();this.classList.add('drag-over')"
+             ondragleave="this.classList.remove('drag-over')"
+             ondrop="event.preventDefault();this.classList.remove('drag-over');handleVqExcelDrop(event)">
+          <div style="font-size:2.8rem">📂</div>
+          <p style="font-weight:700;font-size:.95rem;margin-top:10px">클릭하거나 파일을 드롭하세요</p>
+          <p style="font-size:.75rem;color:var(--text-dim);margin-top:6px">.xlsx · .xls · .csv 지원</p>
+        </div>
+        <input type="file" id="vqFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleVqExcelUpload(event)">
+        <div style="margin-top:28px;padding:16px 20px;background:rgba(37,99,235,.06);border-radius:12px;text-align:left;font-size:.8rem;color:var(--text-muted);line-height:1.8">
+          <strong style="color:var(--accent-cyan);font-size:.85rem">📋 엑셀 파일 형식</strong><br>
+          첫 행 헤더 →
+          <span style="color:var(--accent-gold)">공정처</span> ·
+          <span style="color:var(--accent-gold)">품목</span> ·
+          <span style="color:var(--accent-gold)">품목명</span> ·
+          <span style="color:var(--accent-gold)">공정 불량수량</span> ·
+          <span style="color:var(--accent-gold)">금액</span> ·
+          <span style="color:var(--accent-gold)">선별 불량수량</span> ·
+          <span style="color:var(--accent-gold)">금액</span><br>
+          동일 공정처·품목은 자동으로 합산됩니다. 합계금액 = 공정금액 + 선별금액
+        </div>
+      </div>`;
+    return;
+  }
+
+  const analysis = buildVqAnalysis(vqData);
+  const PAL = ['#ef4444','#f59e0b','#22c55e','#2563eb','#a855f7','#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6'];
+  const rankEmoji = ['🥇','🥈','🥉'];
+
+  // ── 업체 요약 테이블 행 ──
+  const summaryRows = analysis.vendors.map((v, i) => {
+    const sharePct = analysis.grandTotalCost > 0 ? (v.totalCost / analysis.grandTotalCost * 100).toFixed(1) : '0.0';
+    const barColor = PAL[i % PAL.length];
+    const maxCost  = analysis.vendors[0]?.totalCost || 1;
+    const barPct   = maxCost > 0 ? (v.totalCost / maxCost * 100).toFixed(0) : 0;
+    return `<tr>
+      <td style="text-align:center">${rankEmoji[i] || `<span style="color:var(--text-dim)">${i+1}</span>`}</td>
+      <td><strong style="color:${barColor}">${esc(v.name)}</strong></td>
+      <td style="text-align:right;font-weight:700">${v.totalQty.toLocaleString()}개</td>
+      <td style="text-align:right;color:var(--text-dim)">${v.parts.length}개</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="prg-wrap" style="flex:1;min-width:80px">
+            <div class="prg-bar" style="width:${barPct}%;background:${barColor}"></div>
+          </div>
+          <strong style="color:${barColor};white-space:nowrap;min-width:80px;text-align:right">${fmtWon(v.totalCost)}</strong>
+        </div>
+      </td>
+      <td style="text-align:right;color:var(--text-dim)">${sharePct}%</td>
+    </tr>`;
+  }).join('');
+
+  // ── 업체별 품번 세부 내역 ──
+  const detailSections = analysis.vendors.map((v, vi) => {
+    const vColor = PAL[vi % PAL.length];
+    const vMaxCost = v.parts[0]?.totalCost || 1;
+    const partRows = v.parts.map((p, pi) => {
+      const pBarPct = vMaxCost > 0 ? (p.totalCost / vMaxCost * 100).toFixed(0) : 0;
+      const pShare  = v.totalCost > 0 ? (p.totalCost / v.totalCost * 100).toFixed(1) : '0.0';
+      const pColor  = PAL[pi % PAL.length];
+      return `<tr>
+        <td style="text-align:center;color:var(--text-dim)">${pi+1}</td>
+        <td><strong style="font-family:monospace;color:var(--accent-cyan)">${esc(p.partNo||'—')}</strong></td>
+        <td>${esc(p.partName||'—')}</td>
+        <td style="text-align:right">${p.processQty > 0 ? p.processQty.toLocaleString()+'개' : '<span style="color:var(--text-dim)">—</span>'}</td>
+        <td style="text-align:right;color:#f59e0b">${p.processAmt > 0 ? fmtWon(p.processAmt) : '<span style="color:var(--text-dim)">—</span>'}</td>
+        <td style="text-align:right">${p.sortQty > 0 ? p.sortQty.toLocaleString()+'개' : '<span style="color:var(--text-dim)">—</span>'}</td>
+        <td style="text-align:right;color:#a855f7">${p.sortAmt > 0 ? fmtWon(p.sortAmt) : '<span style="color:var(--text-dim)">—</span>'}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="prg-wrap" style="flex:1;min-width:50px">
+              <div class="prg-bar" style="width:${pBarPct}%;background:${pColor}"></div>
+            </div>
+            <strong style="color:${pColor};white-space:nowrap;min-width:72px;text-align:right">${fmtWon(p.totalCost)}</strong>
+          </div>
+        </td>
+        <td style="text-align:right;color:var(--text-dim)">${pShare}%</td>
+      </tr>`;
+    }).join('');
+    return `
+    <div class="card" style="border-color:${vColor}33;margin-bottom:12px">
+      <div class="card-hdr" style="border-bottom:1px solid ${vColor}33">
+        <span class="card-title" style="color:${vColor}">🏗️ ${esc(v.name)}</span>
+        <div style="display:flex;gap:10px;align-items:center">
+          <span style="font-size:.78rem;color:var(--text-muted)">불량 ${v.totalQty.toLocaleString()}개 · ${v.parts.length}개 품목</span>
+          <strong style="color:${vColor}">${fmtWon(v.totalCost)}</strong>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr>
+          <th style="text-align:center">#</th>
+          <th>품목</th><th>품목명</th>
+          <th style="text-align:right">공정 불량수량</th>
+          <th style="text-align:right">공정 금액</th>
+          <th style="text-align:right">선별 불량수량</th>
+          <th style="text-align:right">선별 금액</th>
+          <th>합계 금액</th>
+          <th style="text-align:right">비율</th>
+        </tr></thead>
+        <tbody>${partRows}</tbody>
+        ${v.parts.length > 1 ? `
+        <tfoot><tr style="border-top:2px solid var(--border)">
+          <td colspan="3" style="font-weight:700;padding:10px 12px">소계</td>
+          <td style="text-align:right;font-weight:700">${v.parts.reduce((s,p)=>s+p.processQty,0).toLocaleString()}개</td>
+          <td style="text-align:right;color:#f59e0b;font-weight:700">${fmtWon(v.parts.reduce((s,p)=>s+p.processAmt,0))}</td>
+          <td style="text-align:right;font-weight:700">${v.parts.reduce((s,p)=>s+p.sortQty,0).toLocaleString()}개</td>
+          <td style="text-align:right;color:#a855f7;font-weight:700">${fmtWon(v.parts.reduce((s,p)=>s+p.sortAmt,0))}</td>
+          <td><strong style="color:${vColor}">${fmtWon(v.totalCost)}</strong></td>
+          <td style="text-align:right;color:var(--text-dim)">100%</td>
+        </tr></tfoot>` : ''}
+      </table>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="page-hdr">
+      <h2>업체별 품질 현황</h2>
+      <div class="hdr-actions">
+        <button class="btn-sec" onclick="document.getElementById('vqFileInput2').click()">📂 다른 파일 불러오기</button>
+        <input type="file" id="vqFileInput2" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleVqExcelUpload(event)">
+        <button class="btn-print" onclick="window.print()">🖨 인쇄</button>
+      </div>
+    </div>
+    <div class="g4 sp">
+      <div class="kpi" style="--kc:#ef4444">
+        <div class="kpi-icon">💰</div><div class="kpi-lbl">총 실패 비용</div>
+        <div class="kpi-val" style="font-size:1.3rem">${fmtWon(analysis.grandTotalCost)}</div>
+        <div class="kpi-sub">불량수량 × 단가 합계</div>
+      </div>
+      <div class="kpi" style="--kc:#f59e0b">
+        <div class="kpi-icon">🔢</div><div class="kpi-lbl">총 불량수량</div>
+        <div class="kpi-val">${analysis.grandTotalQty.toLocaleString()}개</div>
+        <div class="kpi-sub">${analysis.rowCount.toLocaleString()}행 · ${analysis.vendors.length}개 업체</div>
+      </div>
+      <div class="kpi" style="--kc:#a855f7">
+        <div class="kpi-icon">⚠️</div><div class="kpi-lbl">최고 비용 업체</div>
+        <div class="kpi-val" style="font-size:${(analysis.vendors[0]?.name||'').length>8?'.75rem':'.9rem'}">${esc(analysis.vendors[0]?.name||'—')}</div>
+        <div class="kpi-sub">${analysis.vendors[0] ? fmtWon(analysis.vendors[0].totalCost) : '—'}</div>
+      </div>
+      <div class="kpi" style="--kc:#22c55e">
+        <div class="kpi-icon">📦</div><div class="kpi-lbl">분석 파일</div>
+        <div class="kpi-val" style="font-size:.72rem;word-break:break-all">${esc(vqData.fileName||'—')}</div>
+        <div class="kpi-sub"><button class="btn-edit btn-edit-text" onclick="openVqColMapModal()" style="font-size:.72rem">✏ 열 매핑 변경</button></div>
+      </div>
+    </div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-hdr">
+          <span class="card-title">📋 업체별 실패 비용 순위</span>
+          <span class="cb">${analysis.vendors.length}개 업체</span>
+        </div>
+        <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr>
+            <th style="text-align:center">순위</th>
+            <th>업체명</th>
+            <th style="text-align:right">총 불량수량</th>
+            <th style="text-align:right">품번수</th>
+            <th>총 실패비용</th>
+            <th style="text-align:right">비율</th>
+          </tr></thead>
+          <tbody>${summaryRows || `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-dim)">열 매핑이 올바른지 확인하세요.</td></tr>`}</tbody>
+          ${analysis.vendors.length > 1 ? `
+          <tfoot><tr style="border-top:2px solid var(--border)">
+            <td colspan="2" style="font-weight:700;padding:10px 12px">합계</td>
+            <td style="text-align:right;font-weight:700">${analysis.grandTotalQty.toLocaleString()}개</td>
+            <td style="text-align:right;color:var(--text-dim)">—</td>
+            <td><strong style="color:#ef4444">${fmtWon(analysis.grandTotalCost)}</strong></td>
+            <td style="text-align:right;color:var(--text-dim)">100%</td>
+          </tr></tfoot>` : ''}
+        </table>
+        </div>
+      </div>
+    <div class="page-hdr" style="margin-top:8px;margin-bottom:12px">
+      <h3 style="font-size:1rem;font-weight:700">📂 업체별 품번 세부 내역</h3>
+    </div>
+    ${detailSections}`;
+}
+
+// ── 분석 로직 ──
+function buildVqAnalysis(data) {
+  const { rows, colMap } = data;
+  const vendorMap = {};
+
+  rows.forEach(row => {
+    const vendor   = String(row[colMap.vendor]   || '').trim() || '미상';
+    const partNo   = String(row[colMap.partNo]   || '').trim();
+    const partName = String(row[colMap.partName] || '').trim();
+    const partKey  = partNo || partName || '미상';
+
+    if (!vendorMap[vendor]) vendorMap[vendor] = { name: vendor, parts: {} };
+    if (!vendorMap[vendor].parts[partKey]) {
+      vendorMap[vendor].parts[partKey] = { partNo, partName, processQty: 0, processAmt: 0, sortQty: 0, sortAmt: 0 };
+    }
+    const processQty = parseMoney(row[colMap.processQty]);
+    const processAmt = parseMoney(row[colMap.processAmt]);
+    const sortQty    = parseMoney(row[colMap.sortQty]);
+    const sortAmt    = parseMoney(row[colMap.sortAmt]);
+    vendorMap[vendor].parts[partKey].processQty += processQty;
+    vendorMap[vendor].parts[partKey].processAmt += processAmt;
+    vendorMap[vendor].parts[partKey].sortQty    += sortQty;
+    vendorMap[vendor].parts[partKey].sortAmt    += sortAmt;
+  });
+
+  const vendors = Object.values(vendorMap).map(v => {
+    const parts = Object.values(v.parts).map(p => ({
+      ...p,
+      totalCost: p.processAmt + p.sortAmt
+    })).sort((a, b) => b.totalCost - a.totalCost);
+    const totalCost = parts.reduce((s, p) => s + p.totalCost, 0);
+    const totalQty  = parts.reduce((s, p) => s + p.processQty + p.sortQty, 0);
+    return { name: v.name, parts, totalCost, totalQty };
+  }).sort((a, b) => b.totalCost - a.totalCost);
+
+  const grandTotalCost = vendors.reduce((s, v) => s + v.totalCost, 0);
+  const grandTotalQty  = vendors.reduce((s, v) => s + v.totalQty, 0);
+  return { vendors, grandTotalCost, grandTotalQty, rowCount: rows.length };
+}
+
+// ── 열 자동 감지 ──
+function detectVqColumns(headers) {
+  const lw = headers.map(h => h.toLowerCase().replace(/[\s_\-\(\)]/g,''));
+  const find = (...pats) => {
+    for (const p of pats) {
+      const idx = lw.findIndex(h => h.includes(p));
+      if (idx >= 0) return headers[idx];
+    }
+    return '';
+  };
+  return {
+    vendor:     find('공정처','업체','vendor','공급','supplier','거래처','협력사'),
+    partNo:     find('품목','품번','partno','자재번호','코드','part_no'),
+    partName:   find('품목명','품명','partname','부품명','자재명','part_name'),
+    processQty: find('공정불량수량','공정불량','공정수량','processqty'),
+    processAmt: find('금액(1)','공정금액','공정금','processamt'),
+    sortQty:    find('선별불량수량','선별불량','선별수량','sortqty'),
+    sortAmt:    find('금액(2)','선별금액','선별금','sortamt'),
+  };
+}
+
+// ── 열 매핑 변경 모달 ──
+function openVqColMapModal() {
+  if (!vqData) return;
+  const noneOpt = '(없음)';
+  const opts = [noneOpt, ...vqData.headers];
+  const schema = [
+    {k:'vendor',     l:'공정처 열 (업체명)',    t:'select', opts},
+    {k:'partNo',     l:'품목 열 (품번)',        t:'select', opts},
+    {k:'partName',   l:'품목명 열',            t:'select', opts},
+    {k:'processQty', l:'공정 불량수량 열',      t:'select', opts},
+    {k:'processAmt', l:'공정 금액 열',          t:'select', opts},
+    {k:'sortQty',    l:'선별 불량수량 열',      t:'select', opts},
+    {k:'sortAmt',    l:'선별 금액 열',          t:'select', opts},
+  ];
+  const cur = {};
+  Object.entries(vqData.colMap).forEach(([k,v]) => { cur[k] = v || noneOpt; });
+  openModal('엑셀 열 매핑 설정', schema, cur, result => {
+    Object.entries(result).forEach(([k,v]) => { vqData.colMap[k] = v === noneOpt ? '' : v; });
+    try { localStorage.setItem('qm_vq_data', JSON.stringify(vqData)); } catch(e) {}
+    const _wid = _currentSessionId || getWeekId(DB);
+    if (_wid) try { localStorage.setItem('qm_sess_vq_'+_wid, JSON.stringify(vqData)); } catch(e) {}
+    renderVendorQuality();
+    renderDashboard();
+    setTimeout(initCollapsible, 80);
+  });
+}
+
+// ── 파일 처리 ──
+function handleVqExcelUpload(event) {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  processVqFile(file);
+}
+function handleVqExcelDrop(event) {
+  const file = event.dataTransfer.files[0];
+  if (!file) return;
+  processVqFile(file);
+}
+function processVqFile(file) {
+  if (typeof XLSX === 'undefined') {
+    alert('라이브러리 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type:'array', cellDates:false });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, { header:1, defval:'' });
+      if (!raw || raw.length < 2) {
+        alert('데이터가 없거나 형식이 맞지 않습니다.\n헤더 행 + 데이터 행이 있는 파일을 사용하세요.');
+        return;
+      }
+      const rawHdr = raw[0].map((h,i) => h ? String(h).trim() : `열${i+1}`);
+      // 중복 헤더 처리: 금액(1), 금액(2) 등으로 구분
+      const hdrCount = {};
+      rawHdr.forEach(h => { hdrCount[h] = (hdrCount[h] || 0) + 1; });
+      const hdrIdx = {};
+      const headers = rawHdr.map(h => {
+        if (hdrCount[h] > 1) { hdrIdx[h] = (hdrIdx[h] || 0) + 1; return `${h}(${hdrIdx[h]})`; }
+        return h;
+      });
+      const rows = raw.slice(1).filter(r => r.some(c => c !== '')).map(r => {
+        const obj = {};
+        headers.forEach((h,i) => { obj[h] = r[i] ?? ''; });
+        return obj;
+      });
+      const colMap = detectVqColumns(headers);
+      vqData = { headers, rows, colMap, fileName: file.name };
+      try { localStorage.setItem('qm_vq_data', JSON.stringify(vqData)); } catch(e) {}
+      const _vqWid = _currentSessionId || getWeekId(DB);
+      if (_vqWid) try { localStorage.setItem('qm_sess_vq_'+_vqWid, JSON.stringify(vqData)); } catch(e) {}
+      renderVendorQuality();
+      renderDashboard();
+      setTimeout(initCollapsible, 80);
+    } catch(err) {
+      alert('파일 처리 중 오류가 발생했습니다:\n' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ── 차트 ──
+// ═══════════════════════════════════════════════
 // FAILURE COST ANALYSIS (EXCEL IMPORT)
 // ═══════════════════════════════════════════════
 let fcData = null; // { headers:[], rows:[], colMap:{} }
-let fcView = 'monthly'; // 'yearly' | 'monthly' | 'weekly'
+try { const _sfc = localStorage.getItem('qm_fc_data'); if (_sfc) fcData = JSON.parse(_sfc); } catch(e) {}
 
+// ═══════════════════════════════════════════════
+// HOLD 현황 (EXCEL IMPORT)
+// ═══════════════════════════════════════════════
+let holdData = null; // { headers:[], rows:[], colMap:{}, fileName:'' }
+try { const _shd = localStorage.getItem('qm_hold_data'); if (_shd) holdData = JSON.parse(_shd); } catch(e) {}
+
+function detectHoldColumns(headers) {
+  const lw = headers.map(h => String(h).toLowerCase().replace(/[\s_\-\(\)\.\/]/g,''));
+  const find = (...pats) => { for (const p of pats) { const i=lw.findIndex(h=>h.includes(p)); if(i>=0) return headers[i]; } return ''; };
+  return {
+    holdNo:    find('lotno','lot','hold번호','홀드번호','lot번호','로트','수신번호','holdno','번호'),
+    partNo:    find('품목','품번','partno','자재번호','코드'),
+    partName:  find('품목명','품명','partname','부품명','자재명'),
+    vendor:    find('생산처','생산','업체','거래처','공급사','supplier','vendor'),
+    holdQty:   find('불합합계','불량합계','hold수량','홀드수량','수량','qty','holdqty'),
+    reason:    find('창고명','창고','사유','hold사유','불량사유','불량유형','reason','defect'),
+    holdDate:  find('hold일자','홀드일자','발생일','일자','날짜','date'),
+    status:    find('상태','처리상태','처리현황','status','hold상태'),
+    holdCost:  find('불량금액','holdcost','불량비용','defectcost','cost'),
+    unitPrice: find('단가','unitprice','단위가격','price'),
+  };
+}
+
+function buildHoldAnalysis(data) {
+  const { rows, colMap } = data;
+  let totalQty = 0, totalCost = 0;
+  const byVendor = {}, byReason = {}, byStatus = {};
+  const PAL_STATUS = { '대기':'#ef4444','진행중':'#f59e0b','해제':'#22c55e','폐기':'#6b7280','검토중':'#2563eb' };
+
+  rows.forEach(row => {
+    const qty    = parseMoney(row[colMap.holdQty])  || 1;
+    const cost   = parseMoney(row[colMap.holdCost]) || 0;
+    const vendor = String(row[colMap.vendor]  || '미지정').trim() || '미지정';
+    const reason = String(row[colMap.reason]  || '미분류').trim() || '미분류';
+    const status = String(row[colMap.status]  || '대기').trim()   || '대기';
+    totalQty  += qty;
+    totalCost += cost;
+    if (!byVendor[vendor])  byVendor[vendor]  = { qty:0, count:0, cost:0 };
+    byVendor[vendor].qty += qty; byVendor[vendor].count++; byVendor[vendor].cost += cost;
+    if (!byReason[reason])  byReason[reason]  = { qty:0, count:0, cost:0 };
+    byReason[reason].qty += qty; byReason[reason].count++; byReason[reason].cost += cost;
+    if (!byStatus[status])  byStatus[status]  = { qty:0, count:0 };
+    byStatus[status].qty += qty; byStatus[status].count++;
+  });
+
+  const vendors  = Object.entries(byVendor).map(([n,v])=>({name:n,...v})).sort((a,b)=>b.qty-a.qty);
+  const reasons  = Object.entries(byReason).map(([n,v])=>({name:n,...v})).sort((a,b)=>b.qty-a.qty);
+  const statuses = Object.entries(byStatus).map(([n,v])=>({name:n,...v,color:PAL_STATUS[n]||'#94a3b8'}));
+  const waitQty    = (byStatus['대기']?.qty||0) + (byStatus['검토중']?.qty||0);
+  const releaseQty = byStatus['해제']?.qty||0;
+  const disposeQty = byStatus['폐기']?.qty||0;
+  const releaseRate = totalQty > 0 ? (releaseQty / totalQty * 100).toFixed(1) : '0.0';
+  return { totalQty, totalCount:rows.length, totalCost, vendors, reasons, statuses, waitQty, releaseQty, disposeQty, releaseRate };
+}
+
+function renderHoldStatus() {
+  const el = document.getElementById('tab-hold');
+  if (!el) return;
+  const PAL = ['#ef4444','#f59e0b','#22c55e','#2563eb','#a855f7','#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6'];
+
+  if (!holdData || !holdData.rows || !holdData.rows.length) {
+    el.innerHTML = `
+      <div class="page-hdr"><h2>Hold 현황</h2></div>
+      <div class="card" style="text-align:center;padding:48px 24px">
+        <div style="font-size:3.5rem;margin-bottom:16px">🔒</div>
+        <h3 style="margin-bottom:8px;font-size:1.15rem">Hold 현황 파일을 업로드하세요</h3>
+        <p style="color:var(--text-muted);margin-bottom:28px;font-size:.85rem;line-height:1.7">
+          Hold 관리 데이터가 담긴 <strong>.xlsx / .xls / .csv</strong> 파일을 선택하면<br>
+          업체별·사유별·처리상태별로 자동 분석합니다.
+        </p>
+        <div class="fc-drop-zone" onclick="document.getElementById('holdFileInput').click()"
+             ondragover="event.preventDefault();this.classList.add('drag-over')"
+             ondragleave="this.classList.remove('drag-over')"
+             ondrop="event.preventDefault();this.classList.remove('drag-over');handleHoldDrop(event)">
+          <div style="font-size:2.8rem">📂</div>
+          <p style="font-weight:700;font-size:.95rem;margin-top:10px">클릭하거나 파일을 드롭하세요</p>
+          <p style="font-size:.75rem;color:var(--text-dim);margin-top:6px">.xlsx · .xls · .csv 지원</p>
+        </div>
+        <input type="file" id="holdFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleHoldUpload(event)">
+        <div style="margin-top:28px;padding:16px 20px;background:rgba(239,68,68,.06);border-radius:12px;text-align:left;font-size:.8rem;color:var(--text-muted);line-height:1.8">
+          <strong style="color:#ef4444;font-size:.85rem">📋 권장 열 구성</strong><br>
+          <span style="color:var(--accent-gold)">LOT NO</span> ·
+          <span style="color:var(--accent-gold)">품목</span> ·
+          <span style="color:var(--accent-gold)">품목명</span> ·
+          <span style="color:var(--accent-gold)">생산처</span> ·
+          <span style="color:var(--accent-gold)">불합합계</span> ·
+          <span style="color:var(--accent-gold)">장고명</span> ·
+          <span style="color:var(--accent-gold)">일자</span> ·
+          <span style="color:var(--accent-gold)">상태</span><br>
+          상태 값 예시: 대기 / 진행중 / 해제 / 폐기 / 검토중
+        </div>
+      </div>`;
+    return;
+  }
+
+  const a = buildHoldAnalysis(holdData);
+  const maxVqty = a.vendors[0]?.qty || 1;
+
+  const hasCost = a.totalCost > 0;
+  let cumQty = 0;
+  const vendorRows = a.vendors.map((v,i) => {
+    cumQty += v.qty;
+    const bar      = (v.qty / maxVqty * 100).toFixed(0);
+    const qtyPct   = a.totalQty > 0 ? (v.qty / a.totalQty * 100).toFixed(1) : '0.0';
+    const cumPct   = a.totalQty > 0 ? (cumQty / a.totalQty * 100).toFixed(1) : '0.0';
+    const costPct  = hasCost && a.totalCost > 0 ? (v.cost / a.totalCost * 100).toFixed(1) : null;
+    const c = PAL[i % PAL.length];
+    return `<tr>
+      <td style="text-align:center;color:var(--text-dim);font-weight:700">${i+1}</td>
+      <td><strong style="color:${c}">${esc(v.name)}</strong></td>
+      <td style="text-align:right">${v.count.toLocaleString()}건</td>
+      <td style="text-align:right;font-weight:700;color:${c}">${v.qty.toLocaleString()}개</td>
+      <td style="text-align:right;color:var(--text-muted)">${qtyPct}%</td>
+      ${hasCost ? `<td style="text-align:right;font-weight:700;color:#2563eb">${fmtWon(v.cost)}</td><td style="text-align:right;color:var(--text-muted)">${costPct}%</td>` : ''}
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="prg-wrap" style="flex:1"><div class="prg-bar" style="width:${bar}%;background:${c}"></div></div>
+          <span style="font-size:.72rem;color:var(--text-dim);min-width:36px;text-align:right">누적 ${cumPct}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const statusBadges = a.statuses.map(s =>
+    `<span style="display:inline-flex;align-items:center;gap:6px;background:${s.color}22;border:1px solid ${s.color}55;border-radius:20px;padding:6px 14px;font-size:.82rem;font-weight:700;color:${s.color}">
+      <span style="width:8px;height:8px;border-radius:50%;background:${s.color};flex-shrink:0"></span>
+      ${esc(s.name)} ${s.qty.toLocaleString()}개 (${s.count}건)
+    </span>`
+  ).join('');
+
+  const colMap = holdData.colMap;
+  const detailRows = holdData.rows.map((row,i) => {
+    const status   = String(row[colMap.status]||'—').trim();
+    const PAL_S    = {'대기':'#ef4444','진행중':'#f59e0b','해제':'#22c55e','폐기':'#6b7280','검토중':'#2563eb'};
+    const sc       = PAL_S[status] || '#94a3b8';
+    const unitP    = colMap.unitPrice ? parseMoney(row[colMap.unitPrice]) : 0;
+    const costVal  = colMap.holdCost  ? parseMoney(row[colMap.holdCost])  : 0;
+    return `<tr>
+      <td style="text-align:center;color:var(--text-dim)">${i+1}</td>
+      <td style="font-family:monospace;font-size:.78rem;color:var(--accent-cyan)">${esc(String(row[colMap.holdNo]||'—'))}</td>
+      <td style="font-family:monospace;font-size:.78rem">${esc(String(row[colMap.partNo]||'—'))}</td>
+      <td>${esc(String(row[colMap.partName]||'—'))}</td>
+      <td>${esc(String(row[colMap.vendor]||'—'))}</td>
+      <td style="text-align:right;font-weight:700">${parseMoney(row[colMap.holdQty]).toLocaleString()}개</td>
+      ${unitP>0?`<td style="text-align:right;color:var(--text-muted)">${unitP.toLocaleString()}원</td>`:'<td style="color:var(--text-dim)">—</td>'}
+      ${costVal>0?`<td style="text-align:right;font-weight:700;color:#2563eb">${fmtWon(costVal)}</td>`:'<td style="color:var(--text-dim)">—</td>'}
+      <td>${esc(String(row[colMap.reason]||'—'))}</td>
+      <td style="color:var(--text-muted);font-size:.78rem">${esc(String(row[colMap.holdDate]||'—'))}</td>
+      <td><span style="color:${sc};font-weight:700;font-size:.8rem">${esc(status)}</span></td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="page-hdr">
+      <h2>Hold 현황</h2>
+      <div class="hdr-actions">
+        <button class="btn-sec" onclick="openHoldColMapModal()">✏ 열 매핑 변경</button>
+        <button class="btn-sec" onclick="document.getElementById('holdFileInput2').click()">📂 다른 파일 불러오기</button>
+        <input type="file" id="holdFileInput2" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleHoldUpload(event)">
+        <button class="btn-print" onclick="window.print()">🖨 인쇄</button>
+      </div>
+    </div>
+    <div class="g4 sp">
+      <div class="kpi" style="--kc:#ef4444">
+        <div class="kpi-icon">🔒</div><div class="kpi-lbl">총 Hold 수량</div>
+        <div class="kpi-val">${a.totalQty.toLocaleString()}개</div>
+        <div class="kpi-sub">${a.totalCount.toLocaleString()}건 · ${holdData.fileName||'—'}</div>
+      </div>
+      <div class="kpi" style="--kc:#f59e0b">
+        <div class="kpi-icon">⏳</div><div class="kpi-lbl">대기/검토 수량</div>
+        <div class="kpi-val">${a.waitQty.toLocaleString()}개</div>
+        <div class="kpi-sub">즉시 처리 필요</div>
+      </div>
+      <div class="kpi" style="--kc:#22c55e">
+        <div class="kpi-icon">✅</div><div class="kpi-lbl">해제 수량</div>
+        <div class="kpi-val">${a.releaseQty.toLocaleString()}개</div>
+        <div class="kpi-sub">해제율 ${a.releaseRate}%</div>
+      </div>
+      <div class="kpi" style="--kc:#2563eb">
+        <div class="kpi-icon">💸</div><div class="kpi-lbl">불량금액 합계</div>
+        <div class="kpi-val">${a.totalCost>0?fmtWon(a.totalCost):'—'}</div>
+        <div class="kpi-sub">${a.vendors.length}개 업체 · ${a.reasons.length}개 사유</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">📊 처리 상태 현황</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;padding:4px 0">${statusBadges||'<span style="color:var(--text-dim)">상태 데이터 없음</span>'}</div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <span class="card-title">🏭 업체별 Hold 현황</span>
+        <span class="cb">${a.vendors.length}개 업체 · 총 ${a.totalQty.toLocaleString()}개${hasCost?' · '+fmtWon(a.totalCost):''}</span>
+      </div>
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr>
+          <th style="text-align:center">순위</th>
+          <th>업체명(생산처)</th>
+          <th style="text-align:right">건수</th>
+          <th style="text-align:right">불합수량</th>
+          <th style="text-align:right">수량비율</th>
+          ${hasCost?'<th style="text-align:right">불량금액</th><th style="text-align:right">금액비율</th>':''}
+          <th>수량 바 / 누적</th>
+        </tr></thead>
+        <tbody>${vendorRows||`<tr><td colspan="${hasCost?8:6}" style="text-align:center;color:var(--text-dim);padding:20px">업체 정보 없음 — 열 매핑을 확인하세요</td></tr>`}</tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">📋 Hold 상세 목록</span><span class="cb">${a.totalCount.toLocaleString()}건</span></div>
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th style="text-align:center">No</th><th>LOT NO</th><th>품목</th><th>품목명</th><th>생산처</th><th style="text-align:right">불합합계</th><th style="text-align:right">단가</th><th style="text-align:right">불량금액</th><th>장고명</th><th>일자</th><th>상태</th></tr></thead>
+        <tbody>${detailRows}</tbody>
+      </table>
+      </div>
+    </div>`;
+}
+
+function handleHoldUpload(event) {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  processHoldFile(file);
+}
+function handleHoldDrop(event) {
+  const file = event.dataTransfer.files[0];
+  if (!file) return;
+  processHoldFile(file);
+}
+function processHoldFile(file) {
+  if (typeof XLSX === 'undefined') { alert('라이브러리 로딩 중입니다. 잠시 후 다시 시도해주세요.'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type:'array', cellDates:false });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, { header:1, defval:'' });
+      if (!raw || raw.length < 2) { alert('데이터가 없거나 형식이 맞지 않습니다.\n헤더 행 + 데이터 행이 있는 파일을 사용하세요.'); return; }
+      const headers = raw[0].map((h,i) => h ? String(h).trim() : `열${i+1}`);
+      const rows = raw.slice(1).filter(r=>r.some(c=>c!=='')).map(r => {
+        const obj={}; headers.forEach((h,i)=>{ obj[h]=r[i]??''; }); return obj;
+      });
+      holdData = { headers, rows, colMap: detectHoldColumns(headers), fileName: file.name };
+      try { localStorage.setItem('qm_hold_data', JSON.stringify(holdData)); } catch(e) {}
+      const _wid = _currentSessionId || getWeekId(DB);
+      if (_wid) try { localStorage.setItem('qm_sess_hold_'+_wid, JSON.stringify(holdData)); } catch(e) {}
+      renderHoldStatus();
+      setTimeout(initCollapsible, 80);
+    } catch(err) { alert('파일 처리 중 오류가 발생했습니다:\n' + err.message); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+function openHoldColMapModal() {
+  if (!holdData) return;
+  const noneOpt = '(없음)';
+  const opts = [noneOpt, ...holdData.headers];
+  const schema = [
+    {k:'holdNo',    l:'LOT NO 열 (Hold번호)',   t:'select', opts},
+    {k:'partNo',    l:'품목 열 (품번)',          t:'select', opts},
+    {k:'partName',  l:'품목명 열 (품명)',        t:'select', opts},
+    {k:'vendor',    l:'생산처 열 (업체)',        t:'select', opts},
+    {k:'holdQty',   l:'불합합계 열 (Hold수량)',  t:'select', opts},
+    {k:'reason',    l:'장고명 열 (사유)',        t:'select', opts},
+    {k:'holdDate',  l:'일자 열',                t:'select', opts},
+    {k:'status',    l:'상태 열',                t:'select', opts},
+    {k:'holdCost',  l:'불량금액 열 (비용)',      t:'select', opts},
+    {k:'unitPrice', l:'단가 열',                t:'select', opts},
+  ];
+  const cur = {};
+  Object.entries(holdData.colMap).forEach(([k,v])=>{ cur[k]=v||noneOpt; });
+  openModal('Hold 열 매핑 설정', schema, cur, result => {
+    Object.entries(result).forEach(([k,v])=>{ holdData.colMap[k] = v===noneOpt ? '' : v; });
+    try { localStorage.setItem('qm_hold_data', JSON.stringify(holdData)); } catch(e) {}
+    const _wid = _currentSessionId || getWeekId(DB);
+    if (_wid) try { localStorage.setItem('qm_sess_hold_'+_wid, JSON.stringify(holdData)); } catch(e) {}
+    renderHoldStatus();
+    setTimeout(initCollapsible, 80);
+  });
+}
 function renderFailureAnalysis() {
   const el = document.getElementById('tab-failcost');
   if (!el) return;
@@ -1852,8 +3569,8 @@ function renderFailureAnalysis() {
         <div style="font-size:3.5rem;margin-bottom:16px">📊</div>
         <h3 style="margin-bottom:8px;font-size:1.15rem">엑셀 파일을 업로드하면 자동으로 분석합니다</h3>
         <p style="color:var(--text-muted);margin-bottom:28px;font-size:.85rem;line-height:1.7">
-          업체별 실패 비용 데이터가 담긴 <strong>.xlsx / .xls / .csv</strong> 파일을 선택하면<br>
-          연간 · 월별 · 주별 업체별 실패 비용을 자동으로 분석하여 표와 차트로 보여줍니다.
+          품번별 불량 데이터가 담긴 <strong>.xlsx / .xls / .csv</strong> 파일을 선택하면<br>
+          품번별로 불량수량을 합산하고 실패비용을 자동 계산합니다.
         </p>
         <div class="fc-drop-zone" onclick="document.getElementById('fcFileInput').click()"
              ondragover="event.preventDefault();this.classList.add('drag-over')"
@@ -1865,16 +3582,45 @@ function renderFailureAnalysis() {
         </div>
         <input type="file" id="fcFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelUpload(event)">
         <div style="margin-top:28px;padding:16px 20px;background:rgba(37,99,235,.06);border-radius:12px;text-align:left;font-size:.8rem;color:var(--text-muted);line-height:1.8">
-          <strong style="color:var(--accent-cyan);font-size:.85rem">📋 권장 엑셀 파일 형식</strong><br>
-          첫 행을 헤더(열 이름)로, 이후 행을 데이터로 구성하세요.<br>
-          <span style="color:var(--accent-gold)">날짜</span> · <span style="color:var(--accent-gold)">업체명</span> · <span style="color:var(--accent-gold)">재작업비용</span> · <span style="color:var(--accent-gold)">폐기비용</span> · <span style="color:var(--accent-gold)">기타비용</span> (또는 <span style="color:var(--accent-gold)">총비용</span>) 열을 포함하면 가장 정확합니다.<br>
-          <span style="color:var(--text-dim)">예) A1:날짜, B1:업체명, C1:재작업비용, D1:폐기비용, E1:기타비용</span>
+          <strong style="color:var(--accent-cyan);font-size:.85rem">📋 엑셀 파일 형식</strong><br>
+          첫 행 헤더 →
+          <span style="color:var(--accent-gold)">품번</span> ·
+          <span style="color:var(--accent-gold)">품명</span> ·
+          <span style="color:var(--accent-gold)">단가</span> ·
+          <span style="color:var(--accent-gold)">불량수량</span><br>
+          동일 품번은 자동으로 합산됩니다. 실패비용 = 불량수량 × 단가
         </div>
       </div>`;
     return;
   }
 
-  const analysis = buildFcAnalysis(fcData, fcView);
+  const analysis = buildFcAnalysis(fcData);
+
+  const rankEmoji = ['🥇','🥈','🥉'];
+  const PAL = ['#ef4444','#f59e0b','#22c55e','#2563eb','#a855f7','#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6'];
+  const maxCost = analysis.parts[0]?.totalCost || 1;
+
+  const tableRows = analysis.parts.map((p,i) => {
+    const barPct = maxCost > 0 ? (p.totalCost / maxCost * 100).toFixed(0) : 0;
+    const sharePct = analysis.grandTotalCost > 0 ? (p.totalCost / analysis.grandTotalCost * 100).toFixed(1) : '0.0';
+    const barColor = PAL[i % PAL.length];
+    return `<tr>
+      <td style="text-align:center">${rankEmoji[i] || `<span style="color:var(--text-dim)">${i+1}</span>`}</td>
+      <td><strong style="font-family:monospace;color:var(--accent-cyan)">${esc(p.partNo||'—')}</strong></td>
+      <td>${esc(p.partName||'—')}</td>
+      <td style="text-align:right;color:var(--text-muted)">${p.unitCost ? p.unitCost.toLocaleString()+'원' : '—'}</td>
+      <td style="text-align:right;font-weight:700">${p.defectQty.toLocaleString()}개</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="prg-wrap" style="flex:1;min-width:60px">
+            <div class="prg-bar" style="width:${barPct}%;background:${barColor}"></div>
+          </div>
+          <strong style="color:${barColor};white-space:nowrap;min-width:72px;text-align:right">${fmtWon(p.totalCost)}</strong>
+        </div>
+      </td>
+      <td style="text-align:right;color:var(--text-dim)">${sharePct}%</td>
+    </tr>`;
+  }).join('');
 
   el.innerHTML = `
     <div class="page-hdr">
@@ -1885,211 +3631,100 @@ function renderFailureAnalysis() {
         <button class="btn-print" onclick="window.print()">🖨 인쇄</button>
       </div>
     </div>
-    ${renderFcKpis(analysis)}
-    <div class="card">
-      <div class="card-hdr">
-        <span class="card-title">🗂️ 열 매핑 설정</span>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:.75rem;color:var(--text-dim)">${esc(fcData.fileName||'')}</span>
-          <button class="btn-edit btn-edit-text" onclick="openFcColMapModal()">✏ 열 변경</button>
-        </div>
+    <div class="g4 sp">
+      <div class="kpi" style="--kc:#ef4444">
+        <div class="kpi-icon">💰</div><div class="kpi-lbl">총 실패 비용</div>
+        <div class="kpi-val" style="font-size:1.3rem">${fmtWon(analysis.grandTotalCost)}</div>
+        <div class="kpi-sub">불량수량 × 단가 합계</div>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:.78rem">
-        ${Object.entries(fcData.colMap).map(([k,v])=>`
-          <span style="background:rgba(37,99,235,.09);border:1px solid rgba(37,99,235,.22);border-radius:8px;padding:4px 12px">
-            <strong style="color:var(--accent-cyan)">${{date:'날짜',vendor:'업체명',rework:'재작업비용',scrap:'폐기비용',extra:'기타비용',total:'총비용'}[k]||k}</strong>
-            → <span style="color:${v?'var(--text-primary)':'var(--text-dim)'}">${v||'미설정'}</span>
-          </span>`).join('')}
+      <div class="kpi" style="--kc:#f59e0b">
+        <div class="kpi-icon">🔢</div><div class="kpi-lbl">총 불량수량</div>
+        <div class="kpi-val">${analysis.grandTotalQty.toLocaleString()}개</div>
+        <div class="kpi-sub">${analysis.rowCount.toLocaleString()}행 데이터 · ${analysis.parts.length}개 품번</div>
+      </div>
+      <div class="kpi" style="--kc:#a855f7">
+        <div class="kpi-icon">⚠️</div><div class="kpi-lbl">최고 비용 품번</div>
+        <div class="kpi-val" style="font-size:${(analysis.parts[0]?.partNo||'').length>8?'.8rem':'.95rem'}">${esc(analysis.parts[0]?.partNo||'—')}</div>
+        <div class="kpi-sub">${analysis.parts[0] ? fmtWon(analysis.parts[0].totalCost) : '—'}</div>
+      </div>
+      <div class="kpi" style="--kc:#22c55e">
+        <div class="kpi-icon">📦</div><div class="kpi-lbl">분석 파일</div>
+        <div class="kpi-val" style="font-size:.72rem;word-break:break-all">${esc(fcData.fileName||'—')}</div>
+        <div class="kpi-sub"><button class="btn-edit btn-edit-text" onclick="openFcColMapModal()" style="font-size:.72rem">✏ 열 매핑 변경</button></div>
       </div>
     </div>
     <div class="card">
       <div class="card-hdr">
-        <span class="card-title">📈 기간별 업체별 실패 비용</span>
-        <div style="display:flex;gap:6px">
-          <button class="fc-view-btn${fcView==='yearly'?' active-view':''}" onclick="setFcView('yearly')">연간</button>
-          <button class="fc-view-btn${fcView==='monthly'?' active-view':''}" onclick="setFcView('monthly')">월별</button>
-          <button class="fc-view-btn${fcView==='weekly'?' active-view':''}" onclick="setFcView('weekly')">주별</button>
-        </div>
+        <span class="card-title">📋 품번별 실패 비용 순위</span>
+        <span class="cb">${analysis.parts.length}개 품번</span>
       </div>
       <div style="overflow-x:auto">
-        ${renderFcTable(analysis)}
-      </div>
-    </div>
-    <div class="g2">
-      <div class="card">
-        <div class="card-hdr">
-          <span class="card-title">🏭 업체별 총 실패 비용</span>
-          <span class="cb">${{yearly:'연간',monthly:'전체 월',weekly:'전체 주'}[fcView]||''} 합계</span>
-        </div>
-        <div class="chart-wrap" style="height:${Math.max(200, analysis.vendors.length*46)}px">
-          <canvas id="chartFcVendor"></canvas>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-hdr">
-          <span class="card-title">📅 기간별 실패 비용 추이</span>
-          <span class="cb">상위 5개 업체</span>
-        </div>
-        <div class="chart-wrap"><canvas id="chartFcTrend"></canvas></div>
+      <table class="tbl">
+        <thead><tr>
+          <th style="text-align:center">순위</th>
+          <th>품번</th><th>품명</th>
+          <th style="text-align:right">단가</th>
+          <th style="text-align:right">불량수량</th>
+          <th>실패비용</th>
+          <th style="text-align:right">비율</th>
+        </tr></thead>
+        <tbody>${tableRows || `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-dim)">열 매핑이 올바른지 확인하세요.</td></tr>`}</tbody>
+        ${analysis.parts.length > 1 ? `
+        <tfoot><tr style="border-top:2px solid var(--border)">
+          <td colspan="4" style="font-weight:700;padding:10px 12px">합계</td>
+          <td style="text-align:right;font-weight:700">${analysis.grandTotalQty.toLocaleString()}개</td>
+          <td><strong style="color:#ef4444">${fmtWon(analysis.grandTotalCost)}</strong></td>
+          <td style="text-align:right;color:var(--text-dim)">100%</td>
+        </tr></tfoot>` : ''}
+      </table>
       </div>
     </div>
     <div class="card">
       <div class="card-hdr">
-        <span class="card-title">📊 업체별 비용 구성 (누적 막대)</span>
-        <span class="cb">${{yearly:'연간',monthly:'월별',weekly:'주별'}[fcView]}</span>
+        <span class="card-title">📊 품번별 실패 비용 비교</span>
+        <span class="cb">불량수량 × 단가</span>
       </div>
-      <div class="chart-wrap" style="height:${Math.max(220, analysis.vendors.length*48)}px">
-        <canvas id="chartFcStack"></canvas>
+      <div class="chart-wrap" style="height:${Math.max(220, analysis.parts.length * 44)}px">
+        <canvas id="chartFcBar"></canvas>
       </div>
     </div>`;
 
   setTimeout(() => initFcCharts(analysis), 60);
 }
 
-function setFcView(v) { fcView = v; renderFailureAnalysis(); }
-
-// ── 분석 로직 ──
-function buildFcAnalysis(data, groupBy) {
+// ── 분석 로직 (품번별 집계) ──
+function buildFcAnalysis(data) {
   const { rows, colMap } = data;
-  const vendorSet = new Set();
-  const periodSet = new Set();
-  const matrix = {}; // period -> vendor -> {rework, scrap, extra, total}
+  const map = {}; // partNo → {partNo, partName, unitCost, defectQty}
 
   rows.forEach(row => {
-    const vendor = String(row[colMap.vendor] || '').trim();
-    if (!vendor) return;
-    vendorSet.add(vendor);
+    const partNo   = String(row[colMap.partNo]   || '').trim();
+    const partName = String(row[colMap.partName] || '').trim();
+    const key = partNo || partName;
+    if (!key) return;
 
-    const dateVal = row[colMap.date];
-    let period = '기간미상';
-    const d = parseFcDate(dateVal);
-    if (d) {
-      if (groupBy === 'yearly')        period = `${d.getFullYear()}년`;
-      else if (groupBy === 'monthly')  period = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-      else                             period = `${d.getFullYear()}-W${String(getWeekNum(d)).padStart(2,'0')}`;
-    }
-    periodSet.add(period);
+    const unitCost  = parseMoney(row[colMap.unitCost]);
+    const defectQty = parseMoney(row[colMap.defectQty]);
 
-    if (!matrix[period]) matrix[period] = {};
-    if (!matrix[period][vendor]) matrix[period][vendor] = {rework:0,scrap:0,extra:0,total:0};
-
-    const rework = parseMoney(row[colMap.rework]);
-    const scrap  = parseMoney(row[colMap.scrap]);
-    const extra  = parseMoney(row[colMap.extra]);
-    let   total  = parseMoney(row[colMap.total]);
-    if (total === 0) total = rework + scrap + extra;
-
-    matrix[period][vendor].rework += rework;
-    matrix[period][vendor].scrap  += scrap;
-    matrix[period][vendor].extra  += extra;
-    matrix[period][vendor].total  += total;
+    if (!map[key]) map[key] = { partNo, partName, unitCost: 0, defectQty: 0 };
+    if (unitCost > 0 && map[key].unitCost === 0) map[key].unitCost = unitCost; // 첫 유효 단가 사용
+    map[key].defectQty += defectQty;
   });
 
-  const vendors = [...vendorSet].sort();
-  const periods = [...periodSet].sort();
+  const parts = Object.values(map).map(p => ({
+    ...p,
+    totalCost: p.defectQty * p.unitCost
+  })).sort((a, b) => b.totalCost - a.totalCost);
 
-  const vendorTotals = {};
-  vendors.forEach(v => {
-    vendorTotals[v] = periods.reduce((s,p) => s + (matrix[p]?.[v]?.total||0), 0);
-  });
-  const grandTotal = Object.values(vendorTotals).reduce((s,v)=>s+v, 0);
+  const grandTotalCost = parts.reduce((s, p) => s + p.totalCost, 0);
+  const grandTotalQty  = parts.reduce((s, p) => s + p.defectQty, 0);
 
-  return { vendors, periods, matrix, vendorTotals, grandTotal, rowCount: rows.length };
-}
-
-function parseFcDate(val) {
-  if (!val && val !== 0) return null;
-  if (typeof val === 'number') {
-    // Excel serial → JS date
-    const d = new Date(Math.round((val - 25569) * 86400 * 1000));
-    if (!isNaN(d)) return d;
-  }
-  const s = String(val).trim();
-  let m = s.match(/(\d{4})[.\-\/](\d{1,2})[.\-\/](\d{1,2})/);
-  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
-  m = s.match(/(\d{4})년\s*(\d{1,2})월(?:\s*(\d{1,2})일)?/);
-  if (m) return new Date(+m[1], +m[2]-1, m[3]?+m[3]:1);
-  m = s.match(/(\d{4})(\d{2})(\d{2})/);
-  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
-  return null;
+  return { parts, grandTotalCost, grandTotalQty, rowCount: rows.length };
 }
 
 function parseMoney(val) {
   if (!val && val !== 0) return 0;
-  return parseFloat(String(val).replace(/[₩,\s원]/g,'')) || 0;
-}
-
-// ── KPI 카드 ──
-function renderFcKpis(analysis) {
-  const sorted = [...analysis.vendors].sort((a,b) => (analysis.vendorTotals[b]||0) - (analysis.vendorTotals[a]||0));
-  const top = sorted[0] || '—';
-  const topCost = analysis.vendorTotals[top] || 0;
-  const labelPeriod = {yearly:'연도',monthly:'월',weekly:'주'}[fcView]||'기간';
-  return `<div class="g4 sp">
-    <div class="kpi" style="--kc:#ef4444">
-      <div class="kpi-icon">💰</div>
-      <div class="kpi-lbl">총 실패 비용</div>
-      <div class="kpi-val" style="font-size:1.4rem">${fmtWon(analysis.grandTotal)}</div>
-      <div class="kpi-sub">분석 기간 전체 합계</div>
-    </div>
-    <div class="kpi" style="--kc:#f59e0b">
-      <div class="kpi-icon">🏭</div>
-      <div class="kpi-lbl">분석 업체 수</div>
-      <div class="kpi-val">${analysis.vendors.length}개</div>
-      <div class="kpi-sub">${analysis.rowCount.toLocaleString()}행 데이터 분석</div>
-    </div>
-    <div class="kpi" style="--kc:#a855f7">
-      <div class="kpi-icon">⚠️</div>
-      <div class="kpi-lbl">최고 비용 업체</div>
-      <div class="kpi-val" style="font-size:${top.length>8?'.85rem':'1rem'}">${esc(top)}</div>
-      <div class="kpi-sub">${fmtWon(topCost)}</div>
-    </div>
-    <div class="kpi" style="--kc:#2563eb">
-      <div class="kpi-icon">📅</div>
-      <div class="kpi-lbl">분석 ${labelPeriod} 수</div>
-      <div class="kpi-val">${analysis.periods.length}</div>
-      <div class="kpi-sub">${analysis.periods[0]||'—'} ~ ${analysis.periods[analysis.periods.length-1]||'—'}</div>
-    </div>
-  </div>`;
-}
-
-// ── 피벗 테이블 ──
-function renderFcTable(analysis) {
-  const { vendors, periods, matrix, vendorTotals, grandTotal } = analysis;
-  if (!vendors.length || !periods.length) {
-    return `<div style="text-align:center;padding:32px;color:var(--text-dim)">표시할 데이터가 없습니다. 열 매핑이 올바른지 확인하세요.</div>`;
-  }
-  const MAX_P = 26;
-  const dp = periods.length > MAX_P ? periods.slice(-MAX_P) : periods;
-  const omitted = periods.length > MAX_P ? `<div style="font-size:.74rem;color:var(--text-dim);padding:6px 0">※ 최근 ${MAX_P}개 기간만 표시 (총 ${periods.length}개 중)</div>` : '';
-
-  const thead = dp.map(p=>`<th style="text-align:right;min-width:96px">${esc(p)}</th>`).join('');
-  const tbody = vendors.map(v => {
-    const cells = dp.map(p => {
-      const val = matrix[p]?.[v]?.total || 0;
-      return `<td style="text-align:right;${val>0?'color:#fbbf24':'color:var(--text-dim)'}">${val>0?fmtWon(val):'—'}</td>`;
-    }).join('');
-    const tot = vendorTotals[v]||0;
-    return `<tr>
-      <td style="min-width:130px"><strong>${esc(v)}</strong></td>
-      ${cells}
-      <td style="text-align:right"><strong style="color:#ef4444">${fmtWon(tot)}</strong></td>
-    </tr>`;
-  }).join('');
-  const tfoot = dp.map(p => {
-    const s = vendors.reduce((acc,v)=>acc+(matrix[p]?.[v]?.total||0), 0);
-    return `<td style="text-align:right;font-weight:700;color:#60a5fa">${s>0?fmtWon(s):'—'}</td>`;
-  }).join('');
-
-  return `${omitted}
-  <table class="tbl tbl-nowrap">
-    <thead><tr><th>업체명</th>${thead}<th style="text-align:right">합계</th></tr></thead>
-    <tbody>${tbody}</tbody>
-    <tfoot><tr style="border-top:2px solid var(--border)">
-      <td style="font-weight:700">기간 합계</td>${tfoot}
-      <td style="text-align:right"><strong style="color:#ef4444">${fmtWon(grandTotal)}</strong></td>
-    </tr></tfoot>
-  </table>`;
+  return parseFloat(String(val).replace(/[₩,\s원개]/g,'')) || 0;
 }
 
 // ── 차트 ──
@@ -2099,58 +3734,18 @@ function initFcCharts(analysis) {
   const tc = isLight ? '#475569' : '#94a3b8';
   const destroy = id => { const c = Chart.getChart(id); if (c) c.destroy(); };
   const PAL = ['#ef4444','#f59e0b','#22c55e','#2563eb','#a855f7','#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6'];
+  const labels = analysis.parts.map(p => p.partNo || p.partName);
+  const costs  = analysis.parts.map(p => p.totalCost);
+  const colors = analysis.parts.map((_, i) => PAL[i % PAL.length]);
 
-  // 업체별 가로 막대
-  if (document.getElementById('chartFcVendor')) {
-    destroy('chartFcVendor');
-    const sv = [...analysis.vendors].sort((a,b)=>(analysis.vendorTotals[b]||0)-(analysis.vendorTotals[a]||0));
-    new Chart('chartFcVendor', {
-      type:'bar',
-      data:{ labels:sv, datasets:[{label:'실패 비용',data:sv.map(v=>analysis.vendorTotals[v]||0),backgroundColor:sv.map((_,i)=>PAL[i%PAL.length]+'cc'),borderRadius:5}]},
-      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmtWon(ctx.raw)}`}}},
-        scales:{x:{grid:{color:gc},ticks:{color:tc,callback:v=>fmtWon(v)}},y:{grid:{display:false},ticks:{color:tc}}}}
-    });
-  }
-
-  // 기간별 추이 (상위 5개 업체)
-  if (document.getElementById('chartFcTrend')) {
-    destroy('chartFcTrend');
-    const MAX_P = 20;
-    const dp = analysis.periods.length > MAX_P ? analysis.periods.slice(-MAX_P) : analysis.periods;
-    const top5 = [...analysis.vendors].sort((a,b)=>(analysis.vendorTotals[b]||0)-(analysis.vendorTotals[a]||0)).slice(0,5);
-    new Chart('chartFcTrend', {
-      type:'line',
-      data:{labels:dp, datasets:top5.map((v,i)=>({
-        label:v, data:dp.map(p=>analysis.matrix[p]?.[v]?.total||0),
-        borderColor:PAL[i%PAL.length], backgroundColor:PAL[i%PAL.length]+'22',
-        borderWidth:2.2, pointRadius:3, tension:.3, fill:false
-      }))},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{position:'top',labels:{boxWidth:10,padding:8,color:tc}},
-                 tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmtWon(ctx.raw)}`}}},
-        scales:{y:{grid:{color:gc},beginAtZero:true,ticks:{color:tc,callback:v=>fmtWon(v)}},
-                x:{grid:{display:false},ticks:{color:tc}}}}
-    });
-  }
-
-  // 업체별 누적 막대
-  if (document.getElementById('chartFcStack')) {
-    destroy('chartFcStack');
-    const MAX_P = 16;
-    const dp = analysis.periods.length > MAX_P ? analysis.periods.slice(-MAX_P) : analysis.periods;
-    const sv = [...analysis.vendors].sort((a,b)=>(analysis.vendorTotals[b]||0)-(analysis.vendorTotals[a]||0));
-    new Chart('chartFcStack', {
-      type:'bar',
-      data:{labels:sv, datasets:dp.map((p,i)=>({
-        label:p, data:sv.map(v=>analysis.matrix[p]?.[v]?.total||0),
-        backgroundColor:PAL[i%PAL.length]+'bb', borderRadius:3
-      }))},
-      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{position:'top',labels:{boxWidth:10,padding:7,color:tc}},
-                 tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmtWon(ctx.raw)}`}}},
-        scales:{x:{stacked:true,grid:{color:gc},ticks:{color:tc,callback:v=>fmtWon(v)}},
-                y:{stacked:true,grid:{display:false},ticks:{color:tc}}}}
+  if (document.getElementById('chartFcBar')) {
+    destroy('chartFcBar');
+    new Chart('chartFcBar', {
+      type: 'bar',
+      data: { labels, datasets: [{ label: '실패 비용', data: costs, backgroundColor: colors.map(c => c + 'cc'), borderRadius: 5 }] },
+      options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${fmtWon(ctx.raw)}` } } },
+        scales: { x: { grid: { color: gc }, ticks: { color: tc, callback: v => fmtWon(v) } }, y: { grid: { display: false }, ticks: { color: tc } } } }
     });
   }
 }
@@ -2188,8 +3783,11 @@ function processFcFile(file) {
       });
       const colMap = detectFcColumns(headers);
       fcData = { headers, rows, colMap, fileName: file.name };
-      fcView = 'monthly';
+      try { localStorage.setItem('qm_fc_data', JSON.stringify(fcData)); } catch(e) {}
+      const _fcWid = _currentSessionId || getWeekId(DB);
+      if (_fcWid) try { localStorage.setItem('qm_sess_fc_'+_fcWid, JSON.stringify(fcData)); } catch(e) {}
       renderFailureAnalysis();
+      setTimeout(initCollapsible, 80);
     } catch(err) {
       alert('파일 처리 중 오류가 발생했습니다:\n' + err.message);
     }
@@ -2199,7 +3797,7 @@ function processFcFile(file) {
 
 // ── 열 자동 감지 ──
 function detectFcColumns(headers) {
-  const lw = headers.map(h => h.toLowerCase().replace(/[\s_-]/g,''));
+  const lw = headers.map(h => h.toLowerCase().replace(/[\s_\-\(\)]/g,''));
   const find = (...pats) => {
     for (const p of pats) {
       const idx = lw.findIndex(h => h.includes(p));
@@ -2208,12 +3806,10 @@ function detectFcColumns(headers) {
     return '';
   };
   return {
-    date:   find('날짜','일자','date','발생일','접수일','연월일','일시'),
-    vendor: find('업체명','업체','협력사','공급사','vendor','supplier','회사명','거래처','제조사'),
-    rework: find('재작업비용','재작업','rework','재작업금액','수리비','재가공'),
-    scrap:  find('폐기비용','폐기','scrap','폐기금액','불량폐기'),
-    extra:  find('기타비용','기타','extra','기타금액','추가비용'),
-    total:  find('총비용','합계','실패비용','총실패비용','total','sum','총액','금액','비용합계','코스트'),
+    partNo:    find('품번','partno','자재번호','코드','번호','part_no'),
+    partName:  find('품명','partname','품목명','부품명','품목','자재명','part_name'),
+    unitCost:  find('단가','unitcost','개당단가','단가금액','price','unit_cost'),
+    defectQty: find('불량수량','불량','defect','defectqty','qty','수량','불량개수','불량갯수'),
   };
 }
 
@@ -2223,19 +3819,228 @@ function openFcColMapModal() {
   const noneOpt = '(없음)';
   const opts = [noneOpt, ...fcData.headers];
   const schema = [
-    {k:'date',  l:'날짜 열',      t:'select', opts},
-    {k:'vendor',l:'업체명 열',    t:'select', opts},
-    {k:'rework',l:'재작업비용 열',t:'select', opts},
-    {k:'scrap', l:'폐기비용 열',  t:'select', opts},
-    {k:'extra', l:'기타비용 열',  t:'select', opts},
-    {k:'total', l:'총비용 열 (재작업+폐기+기타 대신 사용)',t:'select', opts},
+    {k:'partNo',   l:'품번 열',    t:'select', opts},
+    {k:'partName', l:'품명 열',    t:'select', opts},
+    {k:'unitCost', l:'단가 열',    t:'select', opts},
+    {k:'defectQty',l:'불량수량 열',t:'select', opts},
   ];
   const cur = {};
   Object.entries(fcData.colMap).forEach(([k,v])=>{ cur[k]=v||noneOpt; });
   openModal('엑셀 열 매핑 설정', schema, cur, result => {
     Object.entries(result).forEach(([k,v])=>{ fcData.colMap[k] = v===noneOpt ? '' : v; });
+    try { localStorage.setItem('qm_fc_data', JSON.stringify(fcData)); } catch(e) {}
+    const _wid = _currentSessionId || getWeekId(DB);
+    if (_wid) try { localStorage.setItem('qm_sess_fc_'+_wid, JSON.stringify(fcData)); } catch(e) {}
     renderFailureAnalysis();
+    setTimeout(initCollapsible, 80);
   });
+}
+
+// ═══════════════════════════════════════════════
+// ISSUE TRACKER
+// ═══════════════════════════════════════════════
+let _itPhotos = []; // 등록 폼 임시 사진
+
+function renderIssueTracker() {
+  const el = document.getElementById('tab-issue-tracker');
+  if (!el) return;
+  const issues = DB.issueTracker || [];
+  el.innerHTML = `
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">🐛 이슈 등록</span></div>
+    <div style="padding:4px 0 16px">
+      <div class="it-grid">
+        <div>
+          <label class="field-label">불량품번</label>
+          <input id="it-partno" class="it-inp" list="partsList" placeholder="품번 검색 또는 직접 입력…" autocomplete="off" oninput="itLookupPart(this.value)" onchange="itLookupPart(this.value)">
+        </div>
+        <div>
+          <label class="field-label">품명</label>
+          <input id="it-partname" class="it-inp" placeholder="품번 선택 시 자동 완성" autocomplete="off">
+        </div>
+        <div>
+          <label class="field-label">고객사</label>
+          <input id="it-customer" class="it-inp" list="customersList" placeholder="고객사명" autocomplete="off">
+        </div>
+        <div>
+          <label class="field-label">DATE CODE</label>
+          <input id="it-datecode" class="it-inp" placeholder="예: 2503A" autocomplete="off">
+        </div>
+        <div>
+          <label class="field-label">발생 일자</label>
+          <input id="it-occdate" class="it-inp" type="date" autocomplete="off">
+        </div>
+        <div>
+          <label class="field-label">수량</label>
+          <input id="it-qty" class="it-inp" type="number" min="0" placeholder="0" autocomplete="off">
+        </div>
+        <div>
+          <label class="field-label">상태</label>
+          <select id="it-status" class="it-inp">
+            <option value="접수">접수</option>
+            <option value="처리중">처리중</option>
+            <option value="완료">완료</option>
+          </select>
+        </div>
+        <div class="full">
+          <label class="field-label">문제 내용 *</label>
+          <textarea id="it-problem" class="it-inp" rows="3" placeholder="문제 내용을 상세히 입력하세요…" style="resize:vertical"></textarea>
+        </div>
+        <div class="full">
+          <label class="field-label">문제 사진</label>
+          <button class="btn-sec" style="margin-bottom:8px" onclick="document.getElementById('it-photo-input').click()">📷 사진 추가</button>
+          <input id="it-photo-input" type="file" accept="image/*" multiple style="display:none" onchange="itAddPhotos(this)">
+          <div id="it-photo-preview" class="it-photo-strip"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+        <button class="btn-sec" onclick="itClearForm()">초기화</button>
+        <button class="btn-pri" onclick="itSubmit()">✚ 등록</button>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="card-hdr">
+      <span class="card-title">📋 이슈 목록</span>
+      <span class="cb">${issues.length}건</span>
+    </div>
+    <div style="padding:4px 0">
+      ${issues.length === 0
+        ? `<div style="text-align:center;padding:40px;color:var(--text-muted)">등록된 이슈가 없습니다</div>`
+        : issues.slice().reverse().map(itCardHtml).join('')}
+    </div>
+  </div>`;
+  renderItPreviews();
+  setTimeout(initCollapsible, 80);
+}
+
+function itCardHtml(issue) {
+  const photos = (issue.photos||[]).map((src,pi) =>
+    `<div class="it-pview" onclick="itViewPhoto(${issue.id},${pi})">
+      <img src="${esc(src)}" alt="이슈사진" loading="lazy">
+    </div>`).join('');
+  return `<div class="it-card" id="itc-${issue.id}">
+    <div class="it-card-hdr">
+      <strong style="font-family:monospace;color:var(--accent-cyan);font-size:.95rem">${esc(issue.partNo)||'(품번 없음)'}</strong>
+      ${issue.partName ? `<span style="font-weight:600">${esc(issue.partName)}</span>` : ''}
+      <span class="it-badge ${esc(issue.status)}">${esc(issue.status)}</span>
+      <span style="color:var(--text-muted);font-size:.77rem;margin-left:auto">${esc(issue.createdAt)||''}</span>
+      <button class="btn-sec" style="font-size:.74rem;padding:3px 10px" onclick="itCycleStatus(${issue.id})">상태 변경</button>
+      <button class="btn-sec" style="font-size:.74rem;padding:3px 10px;color:#ef4444;border-color:rgba(239,68,68,.35)" onclick="itDelete(${issue.id})">삭제</button>
+    </div>
+    <div class="it-meta">
+      <div><span style="color:var(--text-muted)">고객사</span><br><strong>${esc(issue.customer)||'—'}</strong></div>
+      <div><span style="color:var(--text-muted)">발생 일자</span><br><strong>${esc(issue.occDate)||'—'}</strong></div>
+      <div><span style="color:var(--text-muted)">DATE CODE</span><br><code>${esc(issue.dateCode)||'—'}</code></div>
+      <div><span style="color:var(--text-muted)">수량</span><br><strong style="color:#ef4444">${issue.qty ? Number(issue.qty).toLocaleString()+'개' : '—'}</strong></div>
+    </div>
+    ${issue.problem ? `<div class="it-problem">${esc(issue.problem)}</div>` : ''}
+    ${issue.photos&&issue.photos.length ? `<div class="it-photos">${photos}</div>` : ''}
+  </div>`;
+}
+
+function itLookupPart(val) {
+  if (!val) return;
+  const nameEl = document.getElementById('it-partname');
+  if (!nameEl || !DB.parts || !DB.parts.length) return;
+  // datalist 선택 시 "품번 — 품명" 형식 처리
+  const dashIdx = val.indexOf(' — ');
+  const searchNo = dashIdx >= 0 ? val.slice(0, dashIdx).trim() : val.trim();
+  const found = DB.parts.find(p => p.partNo && p.partNo.toLowerCase() === searchNo.toLowerCase());
+  if (found) {
+    nameEl.value = found.partName || '';
+    if (dashIdx >= 0) document.getElementById('it-partno').value = found.partNo;
+  }
+}
+
+function itAddPhotos(input) {
+  const files = Array.from(input.files);
+  let loaded = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      _itPhotos.push(e.target.result);
+      loaded++;
+      if (loaded === files.length) renderItPreviews();
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function renderItPreviews() {
+  const el = document.getElementById('it-photo-preview');
+  if (!el) return;
+  el.innerHTML = _itPhotos.map((src, i) =>
+    `<div class="it-thumb">
+      <img src="${src}" alt="미리보기">
+      <button class="xt" onclick="itRemovePhoto(${i})" title="삭제">✕</button>
+    </div>`).join('');
+}
+
+function itRemovePhoto(idx) {
+  _itPhotos.splice(idx, 1);
+  renderItPreviews();
+}
+
+function itClearForm() {
+  ['it-partno','it-partname','it-customer','it-occdate','it-datecode','it-qty','it-problem'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const st = document.getElementById('it-status');
+  if (st) st.value = '접수';
+  _itPhotos = [];
+  renderItPreviews();
+}
+
+function itSubmit() {
+  const partNoRaw = (document.getElementById('it-partno')?.value||'').trim();
+  const dashIdx   = partNoRaw.indexOf(' — ');
+  const partNo    = dashIdx >= 0 ? partNoRaw.slice(0, dashIdx).trim() : partNoRaw;
+  const partName  = dashIdx >= 0
+    ? (document.getElementById('it-partname')?.value||'').trim() || partNoRaw.slice(dashIdx+3).trim()
+    : (document.getElementById('it-partname')?.value||'').trim();
+  const customer  = (document.getElementById('it-customer')?.value||'').trim();
+  const dateCode  = (document.getElementById('it-datecode')?.value||'').trim();
+  const occDate   = (document.getElementById('it-occdate')?.value||'').trim();
+  const qty       = (document.getElementById('it-qty')?.value||'').trim();
+  const problem   = (document.getElementById('it-problem')?.value||'').trim();
+  const status    = document.getElementById('it-status')?.value || '접수';
+
+  if (!partNo && !problem) { alert('불량품번 또는 문제 내용을 입력하세요.'); return; }
+
+  if (!DB.issueTracker) DB.issueTracker = [];
+  const now = new Date();
+  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  DB.issueTracker.push({ id: Date.now(), partNo, partName, customer, occDate, dateCode, qty, problem, status, photos: [..._itPhotos], createdAt: fmt(now) });
+  _itPhotos = [];
+  saveData();
+  renderIssueTracker();
+}
+
+function itDelete(id) {
+  if (!confirm('이슈를 삭제하시겠습니까?')) return;
+  DB.issueTracker = (DB.issueTracker||[]).filter(x => x.id !== id);
+  saveData();
+  renderIssueTracker();
+}
+
+function itCycleStatus(id) {
+  const issue = (DB.issueTracker||[]).find(x => x.id === id);
+  if (!issue) return;
+  const list = ['접수','처리중','완료'];
+  issue.status = list[(list.indexOf(issue.status)+1) % list.length];
+  saveData();
+  renderIssueTracker();
+}
+
+function itViewPhoto(issueId, photoIdx) {
+  const issue = (DB.issueTracker||[]).find(x => x.id === issueId);
+  if (!issue || !issue.photos || !issue.photos[photoIdx]) return;
+  const w = window.open('', '_blank', 'width=900,height=700');
+  if (!w) return;
+  w.document.write(`<!DOCTYPE html><html><head><title>이슈 사진</title></head><body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;cursor:zoom-out" onclick="window.close()"><img src="${issue.photos[photoIdx]}" style="max-width:98vw;max-height:98vh;object-fit:contain"></body></html>`);
 }
 
 // ═══════════════════════════════════════════════
@@ -2253,18 +4058,103 @@ function renderParts() {
     <td>${actCell(`editPart(${p.id})`,`delRow('parts',${p.id})`)}</td>
   </tr>`).join('');
 
+  const vendorRows = VENDORS.map((v,i) => `<tr>
+    <td style="color:var(--text-dim)">${i+1}</td>
+    <td><strong>${esc(v.name)}</strong></td>
+    <td>${esc(v.contact)}</td>
+    <td>${esc(v.phone)}</td>
+    <td style="color:var(--text-muted);font-size:.78rem">${esc(v.note)}</td>
+    <td>${actCell(`editVendor(${v.id})`,`delVendor(${v.id})`)}</td>
+  </tr>`).join('');
+
+  const customerRows = CUSTOMERS.map((c,i) => `<tr>
+    <td style="color:var(--text-dim)">${i+1}</td>
+    <td><strong>${esc(c.name)}</strong></td>
+    <td>${esc(c.contact)}</td>
+    <td style="color:var(--text-muted);font-size:.78rem">${esc(c.note)}</td>
+    <td>${actCell(`editCustomer(${c.id})`,`delCustomer(${c.id})`)}</td>
+  </tr>`).join('');
+
   document.getElementById('tab-parts').innerHTML = `
-    <div class="page-hdr"><h2>품번 / 품명 관리</h2></div>
+    <div class="page-hdr"><h2>품번 / 품명 · 업체 · 고객사 관리</h2></div>
     <div class="alert blue" style="margin-bottom:16px">
       <div class="alert-icon">💡</div>
       <div class="alert-body">
-        <h4>자동완성 연동 안내</h4>
-        <p>여기서 등록한 품번·품명은 <strong>불량 현황 · 고객 클레임 · 4M 변경점</strong> 입력 폼에서 자동완성으로 바로 선택할 수 있습니다.</p>
+        <h4>마스터 데이터 안내</h4>
+        <p><strong>단가 마스터</strong>를 등록하면 업체별 재작업·폐기 수량 입력 시 비용이 자동 계산됩니다. <strong>업체명·고객사</strong>는 각 입력 폼에서 자동완성으로 활용됩니다. 모두 주차와 무관하게 영구 저장됩니다.</p>
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:14px">
+      <div class="card" style="border-color:rgba(37,99,235,.3)">
+        <div class="card-hdr">
+          <span class="card-title">🏗️ 공급업체 (자동완성)</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="cb">${VENDORS.length}개 등록</span>
+            ${addRowBtn('업체 추가','addVendor()')}
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>No</th><th>업체명</th><th>담당자</th><th>연락처</th><th>비고</th><th>편집</th></tr></thead>
+          <tbody>${vendorRows||`<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-dim)">등록된 업체가 없습니다.</td></tr>`}</tbody>
+        </table>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(245,158,11,.3)">
+        <div class="card-hdr">
+          <span class="card-title">🚗 고객사 (자동완성)</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="cb">${CUSTOMERS.length}개 등록</span>
+            ${addRowBtn('고객사 추가','addCustomer()')}
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>No</th><th>고객사명</th><th>담당자</th><th>비고</th><th>편집</th></tr></thead>
+          <tbody>${customerRows||`<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-dim)">등록된 고객사가 없습니다.</td></tr>`}</tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="border-color:rgba(168,85,247,.3);margin-bottom:14px"
+         ondragover="event.preventDefault();this.style.borderColor='var(--accent-purple)'"
+         ondragleave="this.style.borderColor='rgba(168,85,247,.3)'"
+         ondrop="event.preventDefault();this.style.borderColor='rgba(168,85,247,.3)';handlePriceExcelDrop(event)">
+      <div class="card-hdr">
+        <span class="card-title">💰 단가 마스터 (자동 비용 계산)</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="cb">${PRICE_MASTER.length}개 등록</span>
+          <button class="btn-add" style="padding:4px 10px;font-size:.72rem" onclick="document.getElementById('priceExcelInput').click()">📥 엑셀 업로드</button>
+          <input type="file" id="priceExcelInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handlePriceExcelUpload(event)">
+          ${addRowBtn('단가 추가','addPrice()')}
+        </div>
+      </div>
+      <div style="margin-bottom:10px;padding:8px 12px;background:rgba(168,85,247,.06);border-radius:8px;font-size:.76rem;color:var(--text-muted);line-height:1.7">
+        📋 <strong style="color:var(--accent-purple)">권장 엑셀 형식</strong>: 첫 행 헤더 —
+        <span style="color:var(--accent-gold)">품번</span> · <span style="color:var(--accent-gold)">품명</span> · <span style="color:var(--accent-gold)">단가</span> · 비고 |
+        재작업단가 = 단가 × 2, 폐기단가 = 단가 × 1 로 자동 계산됩니다. 품번이 일치하면 자동 업데이트, 신규는 추가됩니다.
+      </div>
+      <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>No</th><th>품번</th><th>품명</th><th style="text-align:right">단가</th><th style="text-align:right">재작업단가 (×2)</th><th style="text-align:right">폐기단가 (×1)</th><th>비고</th><th>편집</th></tr></thead>
+        <tbody>${PRICE_MASTER.length ? PRICE_MASTER.map((p,i) => `<tr>
+          <td style="color:var(--text-dim)">${i+1}</td>
+          <td><strong style="font-family:monospace;color:var(--accent-cyan)">${esc(p.partNo)}</strong></td>
+          <td>${esc(p.partName)}</td>
+          <td style="text-align:right;font-weight:700">${p.costUnit ? p.costUnit.toLocaleString()+'원' : '—'}</td>
+          <td style="text-align:right;color:#fbbf24">${p.costUnit ? (p.costUnit*2).toLocaleString()+'원' : '—'}</td>
+          <td style="text-align:right;color:#f87171">${p.costUnit ? p.costUnit.toLocaleString()+'원' : '—'}</td>
+          <td style="font-size:.78rem;color:var(--text-muted)">${esc(p.note)}</td>
+          <td>${actCell(`editPrice(${p.id})`,`delPrice(${p.id})`)}</td>
+        </tr>`).join('') : `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-dim)">
+          등록된 단가가 없습니다. 엑셀 업로드 또는 [＋ 단가 추가]로 등록하세요.
+        </td></tr>`}</tbody>
+      </table>
       </div>
     </div>
     <div class="card" style="border-color:rgba(6,182,212,.25)">
       <div class="card-hdr">
-        <span class="card-title">📥 엑셀 일괄 등록</span>
+        <span class="card-title">📥 품번 엑셀 일괄 등록</span>
         <span class="cb">xlsx · xls · csv</span>
       </div>
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
@@ -2431,8 +4321,249 @@ function updatePartsDatalist() {
 }
 
 // ═══════════════════════════════════════════════
+// MASTER DATA — 업체(공급업체) · 고객사 (세션 무관 영구 저장)
+// ═══════════════════════════════════════════════
+let VENDORS      = [];
+let CUSTOMERS    = [];
+let PRICE_MASTER = [];
+
+function loadMasters() {
+  try { VENDORS      = JSON.parse(localStorage.getItem('qm_vendor_master')   || '[]'); } catch(e) { VENDORS = []; }
+  try { CUSTOMERS    = JSON.parse(localStorage.getItem('qm_customer_master') || '[]'); } catch(e) { CUSTOMERS = []; }
+  try { PRICE_MASTER = JSON.parse(localStorage.getItem('qm_price_master')    || '[]'); } catch(e) { PRICE_MASTER = []; }
+}
+
+function saveMasters() {
+  localStorage.setItem('qm_vendor_master',   JSON.stringify(VENDORS));
+  localStorage.setItem('qm_customer_master', JSON.stringify(CUSTOMERS));
+  localStorage.setItem('qm_price_master',    JSON.stringify(PRICE_MASTER));
+  pushMastersToFirestore();
+  updateMasterDatalises();
+}
+
+function updateMasterDatalises() {
+  const vl = document.getElementById('vendorsList');
+  if (vl) vl.innerHTML = VENDORS.map(v => `<option value="${esc(v.name)}">`).join('');
+  const cl = document.getElementById('customersList');
+  if (cl) cl.innerHTML = CUSTOMERS.map(c => `<option value="${esc(c.name)}">`).join('');
+}
+
+async function pushMastersToFirestore() {
+  if (!_fdb) return;
+  try {
+    await _fdb.collection('qm').doc('masters').set({
+      vendors:      JSON.stringify(VENDORS),
+      customers:    JSON.stringify(CUSTOMERS),
+      priceMaster:  JSON.stringify(PRICE_MASTER),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) { console.warn('마스터 Firestore 저장 실패:', e); }
+}
+
+async function pullMastersFromFirestore() {
+  if (!_fdb) return;
+  try {
+    const snap = await _fdb.collection('qm').doc('masters').get();
+    if (!snap.exists) return;
+    const d = snap.data();
+    if (d.vendors)     { const arr = JSON.parse(d.vendors);     if (arr.length > VENDORS.length)      { VENDORS      = arr; } }
+    if (d.customers)   { const arr = JSON.parse(d.customers);   if (arr.length > CUSTOMERS.length)    { CUSTOMERS    = arr; } }
+    if (d.priceMaster) { const arr = JSON.parse(d.priceMaster); if (arr.length > PRICE_MASTER.length) { PRICE_MASTER = arr; } }
+    localStorage.setItem('qm_vendor_master',   JSON.stringify(VENDORS));
+    localStorage.setItem('qm_customer_master', JSON.stringify(CUSTOMERS));
+    localStorage.setItem('qm_price_master',    JSON.stringify(PRICE_MASTER));
+    updateMasterDatalises();
+    renderParts();
+  } catch(e) { console.warn('마스터 Firestore 로드 실패:', e); }
+}
+
+// ── 업체 CRUD ──
+function addVendor() {
+  openModal('업체 추가', SCHEMA.vendor, {}, result => {
+    if (!result.name.trim()) return;
+    result.id = ++nextId;
+    VENDORS.push(result);
+    saveMasters(); renderParts();
+  });
+}
+function editVendor(id) {
+  const rec = VENDORS.find(v => v.id === id);
+  openModal('업체 편집', SCHEMA.vendor, rec, result => {
+    Object.assign(rec, result);
+    saveMasters(); renderParts();
+  });
+}
+function delVendor(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  VENDORS = VENDORS.filter(v => v.id !== id);
+  saveMasters(); renderParts();
+}
+
+// ── 고객사 CRUD ──
+function addCustomer() {
+  openModal('고객사 추가', SCHEMA.customer, {}, result => {
+    if (!result.name.trim()) return;
+    result.id = ++nextId;
+    CUSTOMERS.push(result);
+    saveMasters(); renderParts();
+  });
+}
+function editCustomer(id) {
+  const rec = CUSTOMERS.find(c => c.id === id);
+  openModal('고객사 편집', SCHEMA.customer, rec, result => {
+    Object.assign(rec, result);
+    saveMasters(); renderParts();
+  });
+}
+function delCustomer(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  CUSTOMERS = CUSTOMERS.filter(c => c.id !== id);
+  saveMasters(); renderParts();
+}
+
+// ── 단가 마스터 CRUD ──
+function addPrice() {
+  openModal('단가 추가', SCHEMA.price, {costUnit:0}, result => {
+    if (!result.partNo.trim() && !result.partName.trim()) return;
+    result.id = ++nextId;
+    PRICE_MASTER.push(result);
+    saveMasters(); renderParts();
+  });
+}
+function editPrice(id) {
+  const rec = PRICE_MASTER.find(p => p.id === id);
+  openModal('단가 편집', SCHEMA.price, rec, result => {
+    Object.assign(rec, result);
+    saveMasters(); renderParts();
+  });
+}
+function delPrice(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  PRICE_MASTER = PRICE_MASTER.filter(p => p.id !== id);
+  saveMasters(); renderParts();
+}
+
+// ── 단가 엑셀 업로드 ──
+function handlePriceExcelUpload(event) {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (file) processPriceFile(file);
+}
+function handlePriceExcelDrop(event) {
+  const file = event.dataTransfer.files[0];
+  if (file) processPriceFile(file);
+}
+function processPriceFile(file) {
+  if (typeof XLSX === 'undefined') { alert('라이브러리 로딩 중입니다. 잠시 후 다시 시도해주세요.'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(new Uint8Array(e.target.result), { type:'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, { header:1, defval:'' });
+      if (!raw || raw.length < 2) { alert('데이터가 없습니다.'); return; }
+
+      // 헤더 탐지
+      const HDR_KW = ['품번','품명','partno','partname','재작업','폐기','단가','scrap','rework'];
+      let hdrIdx = 0;
+      for (let i = 0; i < Math.min(raw.length, 15); i++) {
+        const rowLow = raw[i].map(c => String(c||'').toLowerCase().replace(/[\s_\-\(\)]/g,''));
+        if (HDR_KW.some(k => rowLow.some(c => c.includes(k)))) { hdrIdx = i; break; }
+      }
+      const headers = raw[hdrIdx].map((h,i) => h ? String(h).trim() : `열${i+1}`);
+      const dataRows = raw.slice(hdrIdx + 1).filter(r => r.some(c => c !== ''));
+
+      // 열 매핑
+      const lw = headers.map(h => h.toLowerCase().replace(/[\s_\-\(\)]/g,''));
+      const findCol = (...pats) => {
+        for (const p of pats) { const i = lw.findIndex(h => h.includes(p)); if (i >= 0) return headers[i]; }
+        return '';
+      };
+      const cm = {
+        partNo:        findCol('품번','partno','자재번호','코드','번호'),
+        partName:      findCol('품명','partname','품목','자재명','명칭'),
+        costUnit: findCol('단가','unitcost','unit_cost','단가금액','개당단가','price'),
+        note:          findCol('비고','note','remark','메모'),
+      };
+
+      let added = 0, updated = 0;
+      dataRows.forEach(row => {
+        const byHdr = k => row[headers.indexOf(k)];
+        const partNo   = String(byHdr(cm.partNo)   || '').trim();
+        const partName = String(byHdr(cm.partName)  || '').trim();
+        if (!partNo && !partName) return;
+
+        const parseCost = v => {
+          if (!v && v !== 0) return 0;
+          const n = parseFloat(String(v).replace(/[,\s₩원]/g,''));
+          return isNaN(n) ? 0 : n;
+        };
+
+        const entry = {
+          partNo, partName,
+          costUnit: parseCost(byHdr(cm.costUnit)),
+          note: String(byHdr(cm.note) || '').trim(),
+        };
+
+        // 동일 품번이면 업데이트
+        const existing = PRICE_MASTER.find(p =>
+          (partNo && p.partNo === partNo) || (!partNo && partName && p.partName === partName)
+        );
+        if (existing) { Object.assign(existing, entry); updated++; }
+        else { entry.id = ++nextId; PRICE_MASTER.push(entry); added++; }
+      });
+
+      saveMasters(); renderParts();
+      alert(`단가 마스터 업로드 완료\n신규: ${added}건 / 업데이트: ${updated}건`);
+    } catch(err) {
+      console.error(err);
+      alert('파일 처리 중 오류가 발생했습니다.');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ═══════════════════════════════════════════════
 // RENDER ALL & REFRESH
 // ═══════════════════════════════════════════════
+function initCollapsible() {
+  const KEY = 'qm_collapse_v1';
+  let st = {};
+  try { st = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e) {}
+  document.querySelectorAll('.card').forEach(card => {
+    const hdr = card.querySelector(':scope > .card-hdr');
+    if (!hdr || hdr.querySelector('.collapse-btn')) return;
+    const titleEl = hdr.querySelector('.card-title');
+    const tabEl   = card.closest('[id^="tab-"]');
+    const tabId   = tabEl ? tabEl.id : 'root';
+    const raw     = titleEl ? titleEl.textContent.trim().slice(0, 30) : ('c' + Math.random().toString(36).slice(2));
+    const cardKey = tabId + '__' + raw.replace(/\s+/g,'_').replace(/[^\w가-힣]/g,'');
+    card.dataset.collapseKey = cardKey;
+    if (st[cardKey]) card.classList.add('collapsed');
+    const btn = document.createElement('button');
+    btn.className = 'collapse-btn';
+    btn.title = '접기/펴기';
+    btn.textContent = card.classList.contains('collapsed') ? '▼ 펼치기' : '▲ 접기';
+    btn.onclick = e => {
+      e.stopPropagation();
+      const expanding = card.classList.contains('collapsed');
+      card.classList.toggle('collapsed');
+      btn.textContent = card.classList.contains('collapsed') ? '▼ 펼치기' : '▲ 접기';
+      if (expanding) {
+        card.querySelectorAll('canvas').forEach(cv => {
+          const ch = Chart.getChart(cv); if (ch) setTimeout(() => ch.resize(), 50);
+        });
+      }
+      try {
+        const s = JSON.parse(localStorage.getItem(KEY) || '{}');
+        if (card.classList.contains('collapsed')) s[cardKey] = 1; else delete s[cardKey];
+        localStorage.setItem(KEY, JSON.stringify(s));
+      } catch(e) {}
+    };
+    hdr.appendChild(btn);
+  });
+}
+
 function renderAll() {
   renderDashboard();
   renderDefects();
@@ -2441,13 +4572,17 @@ function renderAll() {
   renderImprovements();
   renderIssues();
   renderParts();
+  renderVendorQuality();
   renderFailureAnalysis();
+  renderHoldStatus();
+  renderIssueTracker();
   updatePartsDatalist();
 }
 
 function refresh() {
   renderAll();
   setTimeout(initCharts, 50);
+  setTimeout(initCollapsible, 80);
 }
 
 // ═══════════════════════════════════════════════
@@ -2460,13 +4595,31 @@ function refresh() {
   const wk = getWeekNum(now);
   document.getElementById('weekBadge').textContent = DB.meeting.week || `${now.getFullYear()}년 ${wk}주차`;
 
+  // 마스터 데이터 로드 (업체·고객사)
+  loadMasters();
+  updateMasterDatalises();
+
+  // 현재 DB를 세션으로 등록
+  _currentSessionId = getWeekId(DB);
+  persistCurrentSession();
+
   applyFontSize();
   setTheme(currentTheme);
   renderAll();
   setTimeout(initCharts, 100);
+  setTimeout(initCollapsible, 120);
 
   // Firestore에서 최신 데이터 로드
   pullFromFirestore();
+
+  // Firestore 세션 목록 동기화
+  pullSessionListFromFirestore();
+
+  // 마스터 데이터 Firestore 동기화
+  pullMastersFromFirestore();
+
+  // 필터바 초기화
+  renderFilterBar();
 
   // ESC closes modal
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
