@@ -14,7 +14,6 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -523,45 +522,45 @@ const _fbConfig = {
   appId: "1:874422493385:web:d9e566791753873cd8ad18"
 };
 let _fdb = null;
-let _fstorage = null;
 try {
   firebase.initializeApp(_fbConfig);
   _fdb = firebase.firestore();
-  _fstorage = firebase.storage();
 } catch(e) { console.warn('Firebase init error:', e); }
 
-// ─── Firebase Storage: 엑셀 파일 데이터 동기화 ───────────────
+// ─── Firestore: 엑셀 파일 데이터 동기화 ───────────────────────
 // type: 'vq' | 'fc' | 'sort' | 'hold'
-async function pushFileDataToStorage(weekId, type, data) {
-  if (!_fstorage || !weekId || !data) return;
+// Firestore 문서 ID: file_{type}_{weekId}  (예: file_vq_2026-W21)
+async function pushFileDataToFirestore(weekId, type, data) {
+  if (!_fdb || !weekId || !data) return;
   try {
-    const ref = _fstorage.ref(`qm-sessions/${weekId}/${type}.json`);
-    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-    await ref.put(blob);
-  } catch(e) { console.warn(`Storage push 실패 (${type}):`, e); }
+    const json = JSON.stringify(data);
+    // Firestore 문서 1MB 제한 초과 방지 (약 900KB 이상이면 건너뜀)
+    if (json.length > 900000) { console.warn(`파일 데이터가 너무 큽니다 (${type}): ${(json.length/1024).toFixed(0)}KB`); return; }
+    await _fdb.collection('qm').doc(`file_${type}_${weekId}`).set({
+      json,
+      type,
+      weekId,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) { console.warn(`파일 데이터 Firestore 저장 실패 (${type}):`, e); }
 }
 
-async function pullFileDataFromStorage(weekId, type) {
-  if (!_fstorage || !weekId) return null;
+async function pullFileDataFromFirestore(weekId, type) {
+  if (!_fdb || !weekId) return null;
   try {
-    const ref = _fstorage.ref(`qm-sessions/${weekId}/${type}.json`);
-    const url = await ref.getDownloadURL();
-    const resp = await fetch(url);
-    return await resp.json();
-  } catch(e) {
-    // object-not-found 는 정상 (업로드 없음)
-    if (e.code !== 'storage/object-not-found') console.warn(`Storage pull 실패 (${type}):`, e);
-    return null;
-  }
+    const snap = await _fdb.collection('qm').doc(`file_${type}_${weekId}`).get();
+    if (snap.exists && snap.data().json) return JSON.parse(snap.data().json);
+  } catch(e) { console.warn(`파일 데이터 Firestore 로드 실패 (${type}):`, e); }
+  return null;
 }
 
-async function pullCurrentSessionFilesFromStorage(weekId) {
+async function pullCurrentSessionFilesFromFirestore(weekId) {
   if (!weekId) return;
   const [_vq, _fc, _sort, _hold] = await Promise.all([
-    pullFileDataFromStorage(weekId, 'vq'),
-    pullFileDataFromStorage(weekId, 'fc'),
-    pullFileDataFromStorage(weekId, 'sort'),
-    pullFileDataFromStorage(weekId, 'hold'),
+    pullFileDataFromFirestore(weekId, 'vq'),
+    pullFileDataFromFirestore(weekId, 'fc'),
+    pullFileDataFromFirestore(weekId, 'sort'),
+    pullFileDataFromFirestore(weekId, 'hold'),
   ]);
   let changed = false;
   if (_vq)   { vqData   = _vq;   try { localStorage.setItem('qm_vq_data',   JSON.stringify(vqData));   localStorage.setItem('qm_sess_vq_'+weekId,   JSON.stringify(vqData));   } catch(e){} changed = true; }
@@ -625,7 +624,7 @@ async function pullFromFirestore() {
       renderFilterBar();
       // Storage에서 파일 데이터 pull (localStorage에 없는 경우)
       if (_pullWeekId && (!vqData || !fcData || !sortData || !holdData)) {
-        pullCurrentSessionFilesFromStorage(_pullWeekId);
+        pullCurrentSessionFilesFromFirestore(_pullWeekId);
       }
     }
     setSyncStatus('ok');
@@ -781,7 +780,7 @@ async function switchSession(weekId) {
   renderFilterBar();
   // localStorage에 없는 파일 데이터는 Storage에서 pull
   const _needPull = !vqData || !fcData || !sortData || !holdData;
-  if (_needPull) pullCurrentSessionFilesFromStorage(weekId);
+  if (_needPull) pullCurrentSessionFilesFromFirestore(weekId);
 }
 
 function renderFilterBar() {
@@ -2231,7 +2230,7 @@ function processSortFile(file) {
       sortData = { headers, rows, colMap, fileName: file.name };
       try { localStorage.setItem('qm_sort_data', JSON.stringify(sortData)); } catch(ee) {}
       const _wid = _currentSessionId || getWeekId(DB);
-      if (_wid) { try { localStorage.setItem('qm_sess_sort_'+_wid, JSON.stringify(sortData)); } catch(ee) {} pushFileDataToStorage(_wid, 'sort', sortData); }
+      if (_wid) { try { localStorage.setItem('qm_sess_sort_'+_wid, JSON.stringify(sortData)); } catch(ee) {} pushFileDataToFirestore(_wid, 'sort', sortData); }
       renderDefects();
       setTimeout(initCollapsible, 80);
     } catch(err) { alert('파일 처리 중 오류가 발생했습니다:\n' + err.message); }
@@ -3319,7 +3318,7 @@ function processVqFile(file) {
       vqData = { headers, rows, colMap, fileName: file.name };
       try { localStorage.setItem('qm_vq_data', JSON.stringify(vqData)); } catch(e) {}
       const _vqWid = _currentSessionId || getWeekId(DB);
-      if (_vqWid) { try { localStorage.setItem('qm_sess_vq_'+_vqWid, JSON.stringify(vqData)); } catch(e) {} pushFileDataToStorage(_vqWid, 'vq', vqData); }
+      if (_vqWid) { try { localStorage.setItem('qm_sess_vq_'+_vqWid, JSON.stringify(vqData)); } catch(e) {} pushFileDataToFirestore(_vqWid, 'vq', vqData); }
       renderVendorQuality();
       renderDashboard();
       setTimeout(initCollapsible, 80);
@@ -3587,7 +3586,7 @@ function processHoldFile(file) {
       holdData = { headers, rows, colMap: detectHoldColumns(headers), fileName: file.name };
       try { localStorage.setItem('qm_hold_data', JSON.stringify(holdData)); } catch(e) {}
       const _wid = _currentSessionId || getWeekId(DB);
-      if (_wid) { try { localStorage.setItem('qm_sess_hold_'+_wid, JSON.stringify(holdData)); } catch(e) {} pushFileDataToStorage(_wid, 'hold', holdData); }
+      if (_wid) { try { localStorage.setItem('qm_sess_hold_'+_wid, JSON.stringify(holdData)); } catch(e) {} pushFileDataToFirestore(_wid, 'hold', holdData); }
       renderHoldStatus();
       setTimeout(initCollapsible, 80);
     } catch(err) { alert('파일 처리 중 오류가 발생했습니다:\n' + err.message); }
@@ -3848,7 +3847,7 @@ function processFcFile(file) {
       fcData = { headers, rows, colMap, fileName: file.name };
       try { localStorage.setItem('qm_fc_data', JSON.stringify(fcData)); } catch(e) {}
       const _fcWid = _currentSessionId || getWeekId(DB);
-      if (_fcWid) { try { localStorage.setItem('qm_sess_fc_'+_fcWid, JSON.stringify(fcData)); } catch(e) {} pushFileDataToStorage(_fcWid, 'fc', fcData); }
+      if (_fcWid) { try { localStorage.setItem('qm_sess_fc_'+_fcWid, JSON.stringify(fcData)); } catch(e) {} pushFileDataToFirestore(_fcWid, 'fc', fcData); }
       renderFailureAnalysis();
       setTimeout(initCollapsible, 80);
     } catch(err) {
@@ -4683,7 +4682,7 @@ function refresh() {
 
   // Storage에서 현재 세션 파일 데이터 pull (localStorage에 없는 경우)
   if (!vqData || !fcData || !sortData || !holdData) {
-    pullCurrentSessionFilesFromStorage(_currentSessionId || getWeekId(DB));
+    pullCurrentSessionFilesFromFirestore(_currentSessionId || getWeekId(DB));
   }
 
   // Firestore 세션 목록 동기화
