@@ -573,6 +573,8 @@ async function pushFileDataToFirestore(weekId, type, data) {
     });
     // main 문서에 fileUpdatedAt 기록 → 다른 PC가 파일 변경을 감지할 수 있도록
     _fdb.collection('qm').doc('main').set({ fileUpdatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }).catch(() => {});
+    // 업로드한 PC 자신은 재pull하지 않도록 방지 (서버 시각 오차 3초 여유)
+    _lastFileUpdatedAtMs = Date.now() + 3000;
   } catch(e) { console.warn(`파일 데이터 Firestore 저장 실패 (${type}):`, e); }
 }
 
@@ -2506,6 +2508,8 @@ function clearFileData(type) {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }).catch(() => {});
     _fdb.collection('qm').doc('main').set({ fileUpdatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }).catch(() => {});
+    // 삭제한 PC 자신은 재pull하지 않도록 방지
+    _lastFileUpdatedAtMs = Date.now() + 3000;
   }
   renderAll();
   setTimeout(initCollapsible, 80);
@@ -5563,10 +5567,20 @@ function refresh() {
     if (_pollWid) pullCurrentSessionFilesFromFirestore(_pollWid);
   }, 120000);
 
-  // 20초 파일 폴링: fileUpdatedAt 여부와 무관하게 항상 최신 파일 동기화
-  setInterval(() => {
-    const wid = _currentSessionId;
-    if (wid) pullCurrentSessionFilesFromFirestore(wid);
+  // 20초 파일 변경 감지 폴링: 다른 PC 업로드/삭제를 빠르게 반영
+  // (자신이 직접 업로드·삭제한 경우는 _lastFileUpdatedAtMs로 재pull 방지)
+  setInterval(async () => {
+    if (!_fdb || !_currentSessionId) return;
+    try {
+      const snap = await _fdb.collection('qm').doc('main').get();
+      if (!snap.exists) return;
+      const f = snap.data().fileUpdatedAt;
+      const remoteMs = f && f.toMillis ? f.toMillis() : 0;
+      if (remoteMs > _lastFileUpdatedAtMs) {
+        _lastFileUpdatedAtMs = remoteMs;
+        pullCurrentSessionFilesFromFirestore(_currentSessionId);
+      }
+    } catch(e) {}
   }, 20000);
 
   // 필터바 초기화
