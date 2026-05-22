@@ -566,7 +566,12 @@ async function pushFileDataToFirestore(weekId, type, data) {
   try {
     const json = JSON.stringify(data);
     // Firestore 문서 1MB 제한 초과 방지 (약 900KB 이상이면 건너뜀)
-    if (json.length > 900000) { console.warn(`파일 데이터가 너무 큽니다 (${type}): ${(json.length/1024).toFixed(0)}KB`); return; }
+    if (json.length > 990000) {
+      const kb = (json.length/1024).toFixed(0);
+      console.warn(`파일 데이터가 너무 큽니다 (${type}): ${kb}KB`);
+      alert(`⚠️ 파일 크기(${kb}KB)가 너무 커서 다른 PC와 공유되지 않습니다.\n(Firestore 한도: 1MB, 실제 사용 가능: ~990KB)\n\n불필요한 열·행을 줄여 재업로드하세요.`);
+      return;
+    }
     await _fdb.collection('qm').doc(`file_${type}_${weekId}`).set({
       json,
       type,
@@ -598,16 +603,21 @@ async function pullCurrentSessionFilesFromFirestore(weekId) {
     pullFileDataFromFirestore(weekId, 'hold'),
   ]);
   let changed = false;
-  function _applyFile(d, key, sessKey, setter) {
+  // currentVal: 로컬 데이터. Firestore 데이터가 더 최신일 때만 덮어씀 (로컬 업로드 보호)
+  function _applyFile(d, key, sessKey, setter, currentVal) {
     if (!d) return;
-    if (d._cleared) { setter(null); try { localStorage.removeItem(key); localStorage.removeItem(sessKey); } catch(e){} }
-    else            { setter(d);    try { localStorage.setItem(key, JSON.stringify(d)); localStorage.setItem(sessKey, JSON.stringify(d)); } catch(e){} }
-    changed = true;
+    if (d._cleared) {
+      setter(null); try { localStorage.removeItem(key); localStorage.removeItem(sessKey); } catch(e){}
+      changed = true;
+    } else if ((d.updatedAt || 0) >= (currentVal?.updatedAt || 0)) {
+      setter(d);    try { localStorage.setItem(key, JSON.stringify(d)); localStorage.setItem(sessKey, JSON.stringify(d)); } catch(e){}
+      changed = true;
+    }
   }
-  _applyFile(_vq,   'qm_vq_data',   'qm_sess_vq_'+weekId,   v => { vqData   = v; });
-  _applyFile(_fc,   'qm_fc_data',   'qm_sess_fc_'+weekId,   v => { fcData   = v; });
-  _applyFile(_sort, 'qm_sort_data', 'qm_sess_sort_'+weekId, v => { sortData = v; });
-  _applyFile(_hold, 'qm_hold_data', 'qm_sess_hold_'+weekId, v => { holdData = v; });
+  _applyFile(_vq,   'qm_vq_data',   'qm_sess_vq_'+weekId,   v => { vqData   = v; }, vqData);
+  _applyFile(_fc,   'qm_fc_data',   'qm_sess_fc_'+weekId,   v => { fcData   = v; }, fcData);
+  _applyFile(_sort, 'qm_sort_data', 'qm_sess_sort_'+weekId, v => { sortData = v; }, sortData);
+  _applyFile(_hold, 'qm_hold_data', 'qm_sess_hold_'+weekId, v => { holdData = v; }, holdData);
   if (changed) { renderAll(); setTimeout(initCharts, 80); setTimeout(initCollapsible, 120); }
 }
 
@@ -622,14 +632,14 @@ function subscribeFileListeners(weekId) {
   _fileListenerWeekId = weekId;
 
   const typeMap = {
-    sort: { lsKey: 'qm_sort_data', sessPrefix: 'qm_sess_sort_', setter: v => { sortData = v; } },
-    vq:   { lsKey: 'qm_vq_data',   sessPrefix: 'qm_sess_vq_',   setter: v => { vqData   = v; } },
-    fc:   { lsKey: 'qm_fc_data',   sessPrefix: 'qm_sess_fc_',   setter: v => { fcData   = v; } },
-    hold: { lsKey: 'qm_hold_data', sessPrefix: 'qm_sess_hold_', setter: v => { holdData = v; } },
+    sort: { lsKey: 'qm_sort_data', sessPrefix: 'qm_sess_sort_', setter: v => { sortData = v; }, getter: () => sortData },
+    vq:   { lsKey: 'qm_vq_data',   sessPrefix: 'qm_sess_vq_',   setter: v => { vqData   = v; }, getter: () => vqData   },
+    fc:   { lsKey: 'qm_fc_data',   sessPrefix: 'qm_sess_fc_',   setter: v => { fcData   = v; }, getter: () => fcData   },
+    hold: { lsKey: 'qm_hold_data', sessPrefix: 'qm_sess_hold_', setter: v => { holdData = v; }, getter: () => holdData },
   };
 
   ['sort','vq','fc','hold'].forEach(type => {
-    const { lsKey, sessPrefix, setter } = typeMap[type];
+    const { lsKey, sessPrefix, setter, getter } = typeMap[type];
     const unsub = _fdb.collection('qm').doc('file_' + type + '_' + weekId).onSnapshot(snap => {
       // hasPendingWrites=true → 이 PC 자신이 방금 쓴 데이터 → 이미 로컬에 반영됨, 건너뜀
       if (snap.metadata.hasPendingWrites) return;
@@ -640,6 +650,12 @@ function subscribeFileListeners(weekId) {
         setter(null);
         try { localStorage.removeItem(lsKey); localStorage.removeItem(sessPrefix + weekId); } catch(e) {}
       } else {
+        // 로컬 데이터보다 최신인 경우에만 적용 (파일 업로드 후 동기화로 덮어씌워지는 현상 방지)
+        const localTs = getter()?.updatedAt || 0;
+        if ((data.updatedAt || 0) < localTs) {
+          console.log(`[sync] ${type} 로컬이 더 최신 (local=${localTs}, remote=${data.updatedAt||0}), 건너뜀`);
+          return;
+        }
         setter(data);
         try { localStorage.setItem(lsKey, JSON.stringify(data)); localStorage.setItem(sessPrefix + weekId, JSON.stringify(data)); } catch(e) {}
       }
@@ -2586,7 +2602,7 @@ function processSortFile(file) {
         return obj;
       });
       const colMap = detectSortColumns(headers);
-      sortData = { headers, rows, colMap, fileName: file.name };
+      sortData = { headers, rows, colMap, fileName: file.name, updatedAt: Date.now() };
       try { localStorage.setItem('qm_sort_data', JSON.stringify(sortData)); } catch(ee) {}
       const _wid = _currentSessionId || getWeekId(DB);
       if (_wid) { try { localStorage.setItem('qm_sess_sort_'+_wid, JSON.stringify(sortData)); } catch(ee) {} pushFileDataToFirestore(_wid, 'sort', sortData); }
@@ -3680,7 +3696,7 @@ function processVqFile(file) {
         return obj;
       });
       const colMap = detectVqColumns(headers);
-      vqData = { headers, rows, colMap, fileName: file.name };
+      vqData = { headers, rows, colMap, fileName: file.name, updatedAt: Date.now() };
       try { localStorage.setItem('qm_vq_data', JSON.stringify(vqData)); } catch(e) {}
       const _vqWid = _currentSessionId || getWeekId(DB);
       if (_vqWid) { try { localStorage.setItem('qm_sess_vq_'+_vqWid, JSON.stringify(vqData)); } catch(e) {} pushFileDataToFirestore(_vqWid, 'vq', vqData); }
@@ -3944,7 +3960,7 @@ function processHoldFile(file) {
       const rows = raw.slice(1).filter(r=>r.some(c=>c!=='')).map(r => {
         const obj={}; headers.forEach((h,i)=>{ obj[h]=r[i]??''; }); return obj;
       });
-      holdData = { headers, rows, colMap: detectHoldColumns(headers), fileName: file.name };
+      holdData = { headers, rows, colMap: detectHoldColumns(headers), fileName: file.name, updatedAt: Date.now() };
       try { localStorage.setItem('qm_hold_data', JSON.stringify(holdData)); } catch(e) {}
       const _wid = _currentSessionId || getWeekId(DB);
       if (_wid) { try { localStorage.setItem('qm_sess_hold_'+_wid, JSON.stringify(holdData)); } catch(e) {} pushFileDataToFirestore(_wid, 'hold', holdData); }
@@ -4354,7 +4370,7 @@ function processFcFile(file) {
         const _savedMap = localStorage.getItem('qm_fc_colmap_manual');
         if (_savedMap) Object.assign(colMap, JSON.parse(_savedMap));
       } catch(e) {}
-      fcData = { headers, rows, colMap, fileName: file.name };
+      fcData = { headers, rows, colMap, fileName: file.name, updatedAt: Date.now() };
       try { localStorage.setItem('qm_fc_data', JSON.stringify(fcData)); } catch(e) {}
       const _fcWid = _currentSessionId || getWeekId(DB);
       if (_fcWid) { try { localStorage.setItem('qm_sess_fc_'+_fcWid, JSON.stringify(fcData)); } catch(e) {} pushFileDataToFirestore(_fcWid, 'fc', fcData); }
