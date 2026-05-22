@@ -1914,7 +1914,9 @@ function calcWeeklyHoldTrendData() {
     totalQty.push(tq); waitQty.push(wq); releaseQty.push(rq);
   });
   return {labels, totalQty, waitQty, releaseQty};
-} {
+}
+
+function calcMonthlyTrendData() {
   const list = loadSessionList();
   if (!list.length) return { labels:[], defectQty:[], inspQty:[], ppm:[] };
   const byMonth = new Map();
